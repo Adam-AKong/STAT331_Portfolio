@@ -11,7 +11,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an A.
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from a Lab or Challenge assignment where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -22,25 +22,37 @@ execute:
 -   `csv`
 
 ```{r wd-1-csv}
+# Week 4: Lab 4 Q 0
+#| message: false
 
+avocado <- read_csv(here::here("Week 4", "Lab 4", "avocado.csv"))
 ```
 
 -   `xlsx`
 
 ```{r wd-1-xlsx}
+# Week 2: Practice Activity Q 1
 
+# Code to read in the ages.xlsx data goes here! 
+read_excel(here::here("Week 2", "Practice Activity", "Ages_Data", "ages.xlsx"))
 ```
 
 -   `txt`
 
 ```{r wd-1-txt}
-
+# Week 5: Practice Activity 5.1 regex Setup
+message <- read_csv(here::here("data", "scrambled_message.txt"))
 ```
 
 **WD-2: I can select necessary columns from a dataset.**
 
 ```{r wd-2}
+# Week 3: Lab 3 Q 9
 
+hiphop_clean |>
+  select(subj, sex, age, ethnic) |>
+  distinct(subj, .keep_all = TRUE) |>
+  summary()
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -48,25 +60,45 @@ execute:
 -   numeric
 
 ```{r wd-3-numeric}
+# Week 3: Lab 3 Q 11
+
+hiphop_clean |>
+  filter(age < 20) |>
+  group_by(word) |>
+  summarize(mean_words = mean(familiarity)) |>
+  slice_max(mean_words)
 
 ```
 
 -   character -- specifically a string
 
 ```{r wd-3-string}
+# Week 5: Practice Activity 5.1 Q 3
 
+message |>
+  filter(str_detect(Word, pattern = "^m"))
 ```
 
 -   factor
 
 ```{r wd-3-factor}
+# Week 3: Lab 3 Q 13
 
+# code chunk for Q13
+hiphop_clean |>
+  filter(sex == 'Male', ethnic == 'white', age > 30) |>
+  group_by(word) |>
+  summarize(mean_words3 = mean(familiarity)) |>
+  slice_max(mean_words3)
 ```
 
 -   date
 
 ```{r wd-3-date}
+# Week 5: Practice Activity 5.2 Lubridate Q 1
 
+suspects_clean <- suspects |>
+  filter(pm(Time.Spotted))
 ```
 
 **WD-4: I can modify existing variables and create new variables in a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -74,25 +106,53 @@ execute:
 -   numeric
 
 ```{r wd-4-numeric}
-
+# Week 4: Lab 4 Q 6 (Revision)
+cali_organic_convention <- cali_avocados |>
+  group_by(type, region) |>
+  summarise(meanprice = mean(AveragePrice)) |>
+  pivot_wider(names_from = type, 
+               values_from = meanprice) |>
+  mutate(avocadoDiff = organic - conventional) |>
+  select(region, avocadoDiff)
 ```
 
 -   character -- specifically a string
 
 ```{r wd-4-string}
+# Week 5: Practice Activity 5.1 Regex Q 6 (Revision)
 
+message |>
+  mutate(word_count = str_length(Word)) |>
+  arrange(desc(word_count)) |>
+  slice_max(word_count)
 ```
 
 -   factor
 
 ```{r wd-4-factor}
+# Week 4: Lab 4 Q 7 (Revision)
+
+#| message: false
+recreate_graph <- cali_avocados |>
+  pivot_longer(cols = Small:ExtraLarge,
+               names_to = "Avocado Size",
+               values_to = "Avocado_Sold") |>
+  group_by(region, type, `Avocado Size`) |>
+  summarise(mean_sold = mean(Avocado_Sold)) |>
+  arrange(desc(`Avocado Size`)) |>
+  mutate(`Avocado Size`= factor(`Avocado Size`, level = c('Small',
+                                                          'Large',
+                                                          'ExtraLarge')))
 
 ```
 
 -   date
 
 ```{r wd-4-date}
+# Week 5 Practice Activity 5.1 Setup
 
+suspects_clean <- suspects |>
+  mutate(Time.Spotted = ymd_hms(Time.Spotted))
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -100,12 +160,27 @@ execute:
 -   `left_join()`
 
 ```{r wd-5-left}
+# Week 4: Challenge 4
 
+combined_data <- cali_avocados |>
+  left_join(HPI_index, by = "region") |>
+  filter(year.x == year.y) |>
+  group_by(year.x, region, AveragePrice)
 ```
 
 -   `right_join()`
 
 ```{r wd-5-right}
+# Week 4: Lab 4 Q 2
+
+topFiveRegions <- metro_avocado |>
+  group_by(region) |>
+  summarise(mean_sold = mean(`Total Volume`)) |>
+  arrange(desc(mean_sold)) |>
+  slice_max(mean_sold, n = 5)
+
+graphFiveMetro <- avocado |>
+  right_join(topFiveRegions)
 
 ```
 
@@ -126,13 +201,45 @@ execute:
 -   `semi_join()`
 
 ```{r wd-6-semi}
+# Week 4: Lab 4 Q 2
+
+#| message: false
+region_major <- tibble(region = c("GreatLakes",
+                                  "Midsouth",
+                                  "Northeast",
+                                  "Plains",
+                                  "SouthCentral",
+                                  "Southeast",
+                                  "West")
+                       )
+
+region_avocado <- avocado |>
+  semi_join(region_major, by = "region")
 
 ```
 
 -   `anti_join()`
 
 ```{r wd-6-anti}
+# Week 4: Lab 4 Q 2
 
+#| message: false
+region_major <- tibble(region = c("GreatLakes",
+                                  "Midsouth",
+                                  "Northeast",
+                                  "Plains",
+                                  "SouthCentral",
+                                  "Southeast",
+                                  "West")
+                       )
+
+region_not_included <- region_major |>
+  bind_rows(tibble(region = c("California",
+                              "SouthCarolina",
+                              "TotalUS")))
+
+metro_avocado <- avocado |>
+  anti_join(region_not_included)
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -140,12 +247,34 @@ execute:
 -   `pivot_longer()`
 
 ```{r wd-7-long}
+# Week 4: Lab 4 Q 7 (Revision)
+
+#| message: false
+recreate_graph <- cali_avocados |>
+  pivot_longer(cols = Small:ExtraLarge,
+               names_to = "Avocado Size",
+               values_to = "Avocado_Sold") |>
+  group_by(region, type, `Avocado Size`) |>
+  summarise(mean_sold = mean(Avocado_Sold)) |>
+  arrange(desc(`Avocado Size`)) |>
+  mutate(`Avocado Size`= factor(`Avocado Size`, level = c('Small',
+                                                          'Large',
+                                                          'ExtraLarge')))
 
 ```
 
 -   `pivot_wider()`
 
 ```{r wd-7-wide}
+# Week 4: Lab 4 Q 6 (Revision)
+
+cali_organic_convention <- cali_avocados |>
+  group_by(type, region) |>
+  summarise(meanprice = mean(AveragePrice)) |>
+  pivot_wider(names_from = type, 
+               values_from = meanprice) |>
+  mutate(avocadoDiff = organic - conventional) |>
+  select(region, avocadoDiff)
 
 ```
 
@@ -153,20 +282,51 @@ execute:
 
 **R-1: I can create professional looking, reproducible analyses using RStudio projects, Quarto documents, and the here package.**
 
-I've done this in the following provided assignments:
+I've done this in the following provided assignments: Lab 2 Challenge 2 Lab 3 Challenge 3 Lab 4 (Maybe).
 
 **R-2: I can write well documented and tidy code.**
 
 -   Example 1
 
 ```{r r-2-1}
-
+# Week 3: Lab 3 Q 4
+hiphop |>
+  select(c(asianMove:blackWeekly)) |>
+  summarise(across(everything(), mean))
 ```
 
 -   Example 2
 
 ```{r r-2-2}
+# Week 4: Lab 4 Q 7
 
+#| message: false
+recreate_graph <- cali_avocados |>
+  pivot_longer(cols = Small:ExtraLarge,
+               names_to = "Avocado Size",
+               values_to = "Avocado_Sold") |>
+  group_by(region, type, `Avocado Size`) |>
+  summarise(mean_sold = mean(Avocado_Sold)) |>
+  arrange(desc(`Avocado Size`)) |>
+  mutate(`Avocado Size`= factor(`Avocado Size`, level = c('Small',
+                                                          'Large',
+                                                          'ExtraLarge')))
+
+# https://www.guru99.com/r-factor-categorical-continuous.html#:~:text=What%20is%20Factor%20in%20R,integer%20data%20values%20as%20levels.
+
+ggplot(recreate_graph, aes(fill = `Avocado Size`, 
+                           x = region,
+                           y = mean_sold)) +
+  geom_bar(position = "fill", stat = "identity") +
+  facet_wrap(~type) +
+  labs(
+    x = "Region of CA",
+    y = "Proportion of Mean Avocados Sold",
+  ) +
+  scale_fill_manual(labels = c("Small", "Large", "Extra Large"), values = c("#a6cee3", "#1f78b4", "#b2df8a")) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))
+  
+# https://ggplot2.tidyverse.org/articles/faq-axes.html
 ```
 
 **R-3: I can write robust programs that are resistant to changes in inputs.**
@@ -174,13 +334,37 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r r-3-1}
+# Week 3: Lab 3 Q 14
 
+hiphop_clean |>
+  filter(sex == 'Male', ethnic == 'white',
+           age > 17, age < 23,
+           city > 10000, city < 60000) |>
+  slice_max(bieber) |>
+  distinct(subj, .keep_all = TRUE)
 ```
 
 -   Example 2
 
 ```{r r-3-2}
+# Week 2: Lab 2 Q 14
 
+#| warning: FALSE
+# Code for question 14!
+ggplot(data = surveys, aes(x = species, y = weight)) +
+  geom_jitter(color = "darkseagreen") +
+  geom_boxplot(outlier.shape = NA) + 
+  labs(
+    title = "Weight Distribution in Grams by Species",
+    x = "Species"
+  ) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(angle=45)
+  )
+
+# Tilted x-axis labels because it would be hard to read.
+# https://www.datanovia.com/en/blog/ggplot-axis-ticks-set-and-rotate-text-labels/
 ```
 
 ## Data Visualization & Summarization
