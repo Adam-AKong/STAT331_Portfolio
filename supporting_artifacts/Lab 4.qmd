@@ -1,0 +1,260 @@
+---
+title: "Lab 4 Avocado Prices"
+author: "Adam Kong"
+format:
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+exectue:
+  echo: true
+  error: true
+---
+
+# **Lab 4: Avocado Prices**
+
+**Tip**
+
+I advise you to focus particularly on:
+
+-   Setting chunk options carefully.
+
+-   Making sure you don't print out more output than you need to.
+
+-   Making your code readable and nicely formatted.
+
+-   Thinking through your desired result before writing any code.
+
+## Lab 4 Reflection
+
+Looking at the submissions comments from Professor Theobold, I looked at my code and reedited most of my code to fix be better and be correct. In the first question I first renamed the avocado sizes from 4046, 4225, 4770 to small, large, and extra large. I also included one more sentence in describing the data set where I found out that the data was actually collected from cash registers who sold Hass Avocado. I also sorted the metro data set into the beginning and even sorted the top five metro cities since that data is only used once at the step 6. In step 2, I changed the code to only include type organic. This changed my answer from South Central to West and reduced the amount of avocados from 1595887 to 1870206. I also changed my code from mean to sum, since it didn't make any sense to average these numbers. I also added a slice to only show the top region and removed the intermediate name since it's not needed. Step 4 got rid of the intermediate object. Step 5 had some better changes, as I said I sorted the data at the top instead of where step 5 was. In the beginning I reused the same code but used the correct data set this time, which was the metro data set. This data set did not include totalUS, regions, and states. In the plot I additionally included color, a boxplot, and jitter by right_joining the top 5 metro regions in to the avocado data set. Step 6 I changed a lot of the code. I realized I had only found the values, but I realized I needed to group the types and regions so I could find their averages. Create two new by types which contain values from avocado the summarise mean type. Then I created another column that found the difference between convention and organic. Step 7 was the most challenging for me because I tried many things to find the average. I only added an additional three lines but to find the average when I ran the code the first time, it was not in the correct direction. At first I tried reorder, a strange rearrange thing but then I used factor variable since the size variables were all factor variables.
+
+What I learned from this week was to try and make things more organised. While I said something similar last week, I realized I'm not very organized with my code. I feel like I need to find better and shorter codes that make it much better. A problem with my code is that I know things are functional, but they could be done much better which is something I want to improve on.
+
+Another thing I learned is that Google is your best friend. I was trying to find a way to get the bars in the column to go the right way. I knew they weren't going the right way because the column order was in the opposite way due to the factor variable order. For the legend I even got rid of the underscore between the avocado sizes.
+
+One thing I think I could improve on is the exclusion or inclusion regions. I feel they could be done in one or two more steps. I also feel like I could be a much more efficient coder. On the right of my screen I notice so many data sets and I feel if time allotted, I could reduce the amount of data sets in my code.
+
+# **1 Getting Started**
+
+[Download `avocado.csv`](https://atheobold.github.io/stat-331/4_tidyr-joins/Lab/avocado.csv)
+
+**Warning**
+
+Save **both** your .qmd file and your data set in the same folder within your Stat 331 directory!
+
+# **2 Introduction & Set-up**
+
+In this lab we're going to be looking at avocado prices.
+
+The dataset comes to us from Kaggle and represents weekly retail scan data. A description of the data can be found [here.](https://www.kaggle.com/neuromusic/avocado-prices)
+
+**Note**
+
+The data set website is an updated data set from the original published in 2018. Please refer to the [main page](https://www.kaggle.com/datasets/neuromusic/avocado-prices) of the original data set for a description of the columns.
+
+## Step 0
+
+**0.** Create a Quarto file, load the data, and declare your package dependencies.
+
+```{r Install packages}
+#| message: false
+library(tidyverse)
+```
+
+```{r Import Avacado Packges}
+#| message: false
+
+avocado <- read_csv(here::here("Week 4", "Lab 4", "avocado.csv"))
+
+# Rename avocado sizes
+
+avocado <- avocado |>
+  rename("Small" = `4046`, "Large" = `4225`, "ExtraLarge" = `4770`)
+```
+
+## Step 1
+
+**1.** Briefly describe the dataset. What information does it contain?
+
+The information in avocado.csv is the historical avocado prices and sales volumes in the United States market. **The data comes from retail sales of Hass Avocados ranging from the years 2015 to 2018.** Also contained in the data set is the observation date, average price, a type variable between conventional or organic grown avocados. The year, the region, the total volume of avocados, and the total number of avocados for each size. **The data was collected from retailer's cash registers based on actual Hass Avocado sales.**
+
+4046 - Small Hass Avocado
+
+4225 - Large Hass Avocado
+
+4770 - Extra Large Hass Avocado
+
+## Step 2
+
+**2.** Clean the data in any way you see fit.
+
+```{r}
+#| message: false
+region_major <- tibble(region = c("GreatLakes",
+                                  "Midsouth",
+                                  "Northeast",
+                                  "NorthernNewEngland",
+                                  "Plains",
+                                  "SouthCentral",
+                                  "Southeast",
+                                  "West",
+                                  "WestTexNewMexico")
+                       )
+
+region_not_included <- region_major |>
+  bind_rows(tibble(region = c("California",
+                              "SouthCarolina",
+                              "TotalUS")))
+
+# Data sets below
+
+
+region_avocado <- avocado |>
+  semi_join(region_major, by = "region")
+
+metro_avocado <- avocado |>
+  anti_join(region_not_included)
+
+# Top 5 Avocado Metro Region
+
+topFiveRegions <- metro_avocado |>
+  group_by(region) |>
+  summarise(mean_sold = mean(`Total Volume`)) |>
+  arrange(desc(mean_sold)) |>
+  slice_max(mean_sold, n = 5)
+
+graphFiveMetro <- avocado |>
+  right_join(topFiveRegions)
+
+```
+
+## Step 3
+
+Which major region sold the most organic, small Hass avocados in 2017?
+
+```{r}
+region_avocado |>
+  filter(year == 2017, type == "organic") |>
+  group_by(region) |>
+  summarise(small_sum_sold = sum(Small)) |>
+  arrange(desc(small_sum_sold)) |> 
+  slice_max(small_sum_sold)
+```
+
+The West Region sold the most organic Small Hass Avocados in 2017 with 1,870,206 avocados sold that year.
+
+## 
+
+Step 4
+
+**4.** Use the `separate()` function to split the `Date` variable into year, month, and day. In which month is the highest volume of avocado sales?
+
+```{r}
+region_avocado |>
+  separate(Date, c("Year", "Month", "Day")) |>
+  group_by(Month) |>
+  summarise(sold_mean = mean(`Total Volume`)) |>
+  arrange(desc(sold_mean)) |>
+  slice_max(sold_mean)
+
+# Looking at the individual sales, we can see that Feburary had the most amount of avocados sold.
+```
+
+February sold the most volume of avocados through all types of avocados and years.
+
+## Step 5
+
+**5.** Which metro area regions sold the most total avocados? Plot side-by-side boxplots of total volume for only the five regions with the highest averages for the `Total Volume` variable.
+
+```{r}
+
+# Top most sold avocados for the five metro regions were:
+# Los Angeles, New York, Dallas Fortworth, Houston, Phoenix Tuscon
+
+ggplot(graphFiveMetro, aes(x = region, y = `Total Volume`, fill = region)) +
+  geom_boxplot() +
+  geom_jitter() +
+  labs(
+    title = "Highest Average Avocados Sold",
+    x = "Region",
+    y = "Average Avocado Sold"
+  )
+```
+
+Top five regions with the highest averages (descending order) are: West, SouthCentral, Northeast, Southeast, and GreatLakes.
+
+## Step 6
+
+The following four California regions are in this dataset: `"LosAngeles"`, `"SanDiego"`, `"Sacramento"`, and `"SanFrancisco"`. Answer the following questions about these California regions **only**.
+
+**6.** In which regions is the price of organic versus conventional avocados most different? Support your answer with a few summary statistics and a visualization.
+
+```{r}
+#| message: false
+california_cities <- tibble(region = c("LosAngeles",
+                                       "SanDiego",
+                                       "Sacramento",
+                                       "SanFrancisco"))
+
+cali_avocados <- avocado |>
+  semi_join(california_cities, by = "region")
+
+cali_organic_convention <- cali_avocados |>
+  group_by(type, region) |>
+  summarise(meanprice = mean(AveragePrice)) |>
+  pivot_wider(names_from = type, 
+               values_from = meanprice) |>
+  mutate(avocadoDiff = organic - conventional) |>
+  select(region, avocadoDiff)
+
+ggplot(cali_organic_convention, mapping = aes(x = region, 
+                                              y = avocadoDiff, 
+                                              fill = region)) +
+  geom_col() +
+  labs(x = "CA Region", y = "Average Avocado Difference")
+```
+
+Looking at the cali_diff variable, we can see that San Francisco has the biggest difference in price between organic and conventional. Los Angeles has the lowest price difference. Looking at the first graph it's obvious that organic avocados cost a lot more than conventional avocados. Organic avocados cost more by 1 dollar on average, 1.2 more on average in Los Angeles and 1.8 dollars more on average in San Francisco.
+
+## Step 7
+
+```{r}
+#| message: false
+recreate_graph <- cali_avocados |>
+  pivot_longer(cols = Small:ExtraLarge,
+               names_to = "Avocado Size",
+               values_to = "Avocado_Sold") |>
+  group_by(region, type, `Avocado Size`) |>
+  summarise(mean_sold = mean(Avocado_Sold)) |>
+  arrange(desc(`Avocado Size`)) |>
+  mutate(`Avocado Size`= factor(`Avocado Size`, level = c('Small',
+                                                          'Large',
+                                                          'ExtraLarge')))
+
+# https://www.guru99.com/r-factor-categorical-continuous.html#:~:text=What%20is%20Factor%20in%20R,integer%20data%20values%20as%20levels.
+
+ggplot(recreate_graph, aes(fill = `Avocado Size`, 
+                           x = region,
+                           y = mean_sold)) +
+  geom_bar(position = "fill", stat = "identity") +
+  facet_wrap(~type) +
+  labs(
+    x = "Region of CA",
+    y = "Proportion of Mean Avocados Sold",
+  ) +
+  scale_fill_manual(labels = c("Small", "Large", "Extra Large"), values = c("#a6cee3", "#1f78b4", "#b2df8a")) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))
+  
+# https://ggplot2.tidyverse.org/articles/faq-axes.html
+```
+
+# **5 Challenge**
+
+A joke in the media is that Millennials can't afford houses, because they spend all their money buying avocado toast. Let's use this dataset to address that claim.
+
+> Find or make a dataset with house prices for these four California regions. Join this dataset with your California avocado dataset.
+
+> Use your new joined dataset to make an argument about the relationship between house prices and avocado prices/sales.
+
+> Support your argument with a plot.

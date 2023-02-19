@@ -1,0 +1,42 @@
+---
+title: "Ugly Penguin Graph"
+author: "Adam Kong"
+format:
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+execute:
+  echo: true
+  error: true
+---
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+```{r}
+ugly <- ggplot(data = penguins) + 
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm, color = species, shape = island, size = year, alpha = body_mass_g)) +
+  labs(x = "BiLL lenGtH(mM0)", y = "bIlL leNgTh9(mm))") + 
+  scale_shape_manual(values = c(9, 16, 19)) + 
+  theme_light() +
+  geom_smooth(mapping = aes(x = bill_length_mm, y = bill_depth_mm, color = island))
+
+ugly + theme(
+  panel.background = element_rect(fill = "#7B3F00", size = 5)) +
+  theme(plot.background = element_rect(fill = "#FFFF00", size = 0.1))
+```
+
+```{r}
+set.seed(417)
+library(plotly)
+temp <- penguins[,4]
+pressure <- rnorm(100)
+dtime <- 1:100
+```
+
+```{r}
+plot_ly(x=temp, y=pressure, z=dtime, type="scatter3d", mode="markers")
+```

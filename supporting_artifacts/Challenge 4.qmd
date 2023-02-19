@@ -1,0 +1,147 @@
+---
+title: "Challenge 4 Avocado Prices"
+author: "Adam Kong"
+format:
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+    theme: lux
+    backgroundcolor: "#aff4e8"
+exectue:
+  echo: true
+  error: true
+---
+
+# **Challenge 4: Avocado Toast Ate My Mortgage**
+
+## Step 0
+
+**0.** Create a Quarto file, load the data, and declare your package dependencies.
+
+```{r Install packages}
+#| message: false
+
+library(tidyverse)
+```
+
+```{r Import Avacado and Housing Packges}
+#| message: false
+
+avocado <- read_csv(here::here("Week 4", "Lab 4", "avocado.csv"))
+housing <- read_csv(here::here("Week 4", "Lab 4", "housing_cost.csv"))
+
+# Kinda don't want to use the housing sheet anymore here
+
+HPI_index <- read_csv(here::here("Week 4", "Lab 4", "HPI_master.csv"))
+```
+
+# **5 Challenge**
+
+A joke in the media is that Millennials can't afford houses, because they spend all their money buying avocado toast. Let's use this dataset to address that claim.
+
+> Find or make a dataset with house prices for these four California regions. Join this dataset with your California avocado dataset.
+
+> Use your new joined dataset to make an argument about the relationship between house prices and avocado prices/sales.
+
+> Support your argument with a plot.
+
+## Challenge 4
+
+Put data from this website on to an excel sheet with the necessary information:
+
+https://www.fhfa.gov/DataTools/Downloads/Pages/House-Price-Index-Datasets.aspx
+
+```{r}
+#| message: false
+
+# Copied from Question 6 and 7 from Lab 4.
+
+california_cities <- tibble(region = c("LosAngeles",
+                                       "SanDiego",
+                                       "Sacramento",
+                                       "SanFrancisco"))
+
+cali_avocados <- avocado |>
+  semi_join(california_cities, by = "region")
+
+combined_data <- cali_avocados |>
+  left_join(HPI_index, by = "region") |>
+  filter(year.x == year.y) |>
+  group_by(year.x, region, AveragePrice)
+  
+  
+  # Almost 720,000 lines unfiltered when combined
+  
+
+```
+
+Note: I had to adjust the names of the four cities to join with semi-join correctly.
+
+```{r}
+#| layout-ncol: 2
+#| fig-cap: 
+#|    - "Average Avocado Price 2015 - 2018 Bar Graph"
+#|    - "Average Avocado Price 2015 - 2018 Boxplot"
+#|    - "Average Housing Index 2015 - 2018 Bar Graph"
+#|    - "Average Housing Index 2015 - 2018 Boxplot"
+
+
+ggplot(combined_data, aes(x = year.x, y = AveragePrice)) +
+  geom_bar(mapping = aes(fill = region),
+           position = "dodge", stat = "identity") +
+  labs(
+    x = "Year",
+    y = "Average Avocado Price"
+  )
+
+ggplot(combined_data, aes(x = year.x, y = AveragePrice)) +
+  geom_boxplot(mapping = aes(fill = region)) +
+  labs(
+    x = "Year",
+    y = "Average Avocado Price"
+  )
+
+ggplot(combined_data, aes(x = year.x, y = index_nsa)) +
+  geom_bar(mapping = aes(fill = region),
+           position = "dodge", stat = "identity") +
+  labs(
+    x = "Year",
+    y = "Average Housing Index"
+  )
+
+ggplot(combined_data, aes(x = year.x, y = index_nsa)) +
+  geom_boxplot(mapping = aes(fill = region)) +
+  labs(
+    x = "Year",
+    y = "Average Housing Index"
+  )
+  
+```
+
+The first two graphs here compare the change in average avocado cost per year and within region. Here Using these graphs I determined that Los Angeles had one of the lower average costs while San Francisco had one of the higher average cost. Although between 2016 and 2017 avocado prices rose high quickly before falling back down to normal in 2018.
+
+In the second two graphs the average housing index increases every year. The index indicates a change in the U.S. residential housing market by tracking individual housing market. As indicated by the graphs, the housing index rises as years increase.
+
+```{r}
+#| layout-ncol: 3
+#| fig-cap: 
+#|    - "Average Avocado Price versus Housing Index (2015 - 2018)"
+#|    - "Average Avocado Price Histogram (2015 - 2018)"
+#|    - "Index NSA Histogram (2015 - 2018)"
+
+ggplot(combined_data) +
+  geom_jitter(mapping = aes(x = AveragePrice, y = index_nsa, 
+                           color = region, shape = region))
+
+ggplot(combined_data) +
+  geom_density(mapping = aes(x = AveragePrice))
+
+ggplot(combined_data) +
+  geom_density(mapping = aes(x = index_nsa))
+
+```
+
+The first graph represents a comparison between housing index and the average price of an avocado. Colored in is region and there are clear sections to indicate that Sacramento have some of the lowest range of index, while San Francisco has the highest range of index. San Francisco also has the largest range of average avocado prices, while Los Angeles has the smallest range of average avocado prices.
+
+In the second graph, it's clear most of the average avocado prices are around 1 dollar and in the second graph, most of the average index is around 250.

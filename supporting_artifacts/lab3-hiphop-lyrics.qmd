@@ -1,0 +1,389 @@
+---
+title: "Lab 3 Hip Hop Lyrics"
+author: "Adam Kong"
+format:
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+exectue:
+  echo: true
+  error: true
+---
+
+# Reflection and Revisions
+
+While much of my code functions properly and gives proper output, there are areas where I could have improved my code and explanation. Some of my code needs to be more efficient and assigned to variable names. Some libraries did not need to be called and my code can be shorter in other areas. First I should have written more about the data set and try to summarize more of the important variables that the data set was trying to find, since those variables were the only ones constantly changing per row. Second some of my code could use a better tool such as a summarise and across to find the means of the missing data set. For Q6, I removed the words in count() so that instead of counting each word individually in the set, it does an overall count of the words in the columns. In Q9 I further explain why I used subject ids and fixed my plots in Q10, specifically the bar graph to represent the true amount of participants. In the final problem, question 14, I found the bieber using slice_max() at finding the most likely bieber which was better than filtering a specific value since that value could be anything and the bieber could have not gone with that value. Overall, after reading feedback and rereading my code I think I learned to reread and optimize my code and explanation to represent the data that the readers and I are trying to find.
+
+# Getting Started
+
+[Download starter .qmd file](lab3-hiphop-lyrics.qmd)
+
+::: callout-caution
+# Add your preferred YAML
+
+The downloaded file **does not** contain an YAML, you need to include your own. This allows you to specify how you would like your rendered HTML to look! The sky is the limit!
+:::
+
+[Download `hiphop.csv`](hiphop.csv)
+
+::: callout-warning
+Save **both** your .qmd file and your data set in the same folder within your Stat 331 directory! **DO NOT** open your .qmd file straight from your downloads folder.
+:::
+
+## Tips for Formatting your Lab
+
+::: {.callout-tip collapse="true"}
+-   The first chunk of your Quarto document should be to *declare your libraries* (probably only `tidyverse` for now).
+-   The second chunk of your Quarto document should be to *load in your data* (using the `here()` function!).
+-   Make sure you address **all the questions** in these instructions.
+-   If a question requires **any** type of calculation, **you should provide code for your answer!**
+-   I have provided hints about functions that might be useful to you. You are **not required** to use these functions.
+-   You may have to Google to solve some of these!
+-   Be sure to **save** your work regularly (`Ctrl/Cmd + S` or `File > Save` or the floppy disk icon)
+-   Be sure to **render** your file every so often, to check for errors and make sure it looks nice.
+    -   Make your Quarto document does not contain `View(dataset)` or `install.packages("package")`, both of these will prevent rendering.
+    -   Check your Quarto document for moments when you looked at the data by typing the name of the data frame. Leaving these in means the whole dataset will print out and this looks unprofessional.
+    -   If you are unable to finish due to errors in your code, remember that you can still submit an HTML file if you specify `error: true` in your `execute` options (in the YAML).
+:::
+
+# Data Set
+
+The data set `hiphop` contains results from a study conducted by a linguist at the University of Minnesota. The researcher was interested in predicting musical taste based on familiarity with African American English (AAE). 168 subjects participated in the study, and each was asked to define 64 different AAE terms. The definitions given were used to create a `familiarity` score for each subject for each term. This score quantifies how well the subject knew the term on a scale of 1-5 (1 = not at all, 5 = very well). Before tackling the problems, study the description of each variable [here](http://conservancy.umn.edu/bitstream/handle/11299/116327/5/explanationAAEHiphopChesley.txt).
+
+**1. Load the appropriate R packages and import the data set, `hiphop`.**
+
+```{r packages}
+#| message: false
+# code chunk for loading packages and importing the data
+library(tidyverse)
+library(dplyr)
+library(ggridges)
+```
+
+```{r read csv}
+#| message: false
+hiphop <- read_csv(here::here("Week 3", "Lab 3", "hiphop.csv"))
+```
+
+## Summary
+
+**2. Provide a brief overview (2-4 sentences) of the data set.**
+
+```{r dataset-explore}
+#| message: false
+# you may want to use code to answer this question
+dim(hiphop)
+spec(hiphop)
+```
+
+This dataset contains 10,752 rows and 38 columns. Of those 38 columns there are 4 character data type and 34 numerical datatype. Each row represents one of the 64 different AAE word that each of the 168 participants was surveyed about. The variables measured was information about the by numbers based on demographics, music variables, pop-culture variables, and experimental items. The dependent measure/response variables should change per person, subject and familiarity with one of the AAE words.
+
+**Revised answer / Additional context below**
+
+While all of the 168 participants data and answers say the same for many of the questions, one constantly changing variable of interest changes, which is the word and word familiarity. The word familiarity number measures how familiar a participant is to the definitions to the 64 AAE words.
+
+::: callout-note
+It is always good practice to start an analysis by getting a feel for the data and providing a quick summary for readers. You do not need to show any source code for this question, although you probably want to use code to get some information about the data set.
+:::
+
+**3. What are the rows of this data set?**
+
+::: callout-warning
+It is not one person per row!
+:::
+
+```{r rows}
+# you may want to use code to answer this question
+dim(hiphop)
+
+```
+
+As outputted by the code there are 10,752 rows and 38 columns. In the instructions there are 168 participants and 64 words. Multiply 168 by 64 and it is equal to 10,752. So each row contains some constant information about each participant, while some variables change in each row such as different types of words and the participants familiarity to each word.
+
+## Cleaning the Data
+
+**4. Missing values for some of the variables were replaced with other values. How were missing values replaced? What do you believe are some benefits and drawbacks of doing this?**
+
+```{r missing}
+# you may want to use code to answer this question
+hiphop |>
+  select(c(asianMove:blackWeekly)) |>
+  summarise(across(everything(), mean))
+
+# https://cmdlinetips.com/2021/06/compute-column-means-in-r/
+
+# Code used to find the mean of all the columns.
+```
+
+Some missing values were replaced with the mean of the variable. In the move variables and the blackWeekly variables, missing variables were replaced with the mean values. This was most likely beneficial since if the data included 0s then the average would go down and not be representative of the data. The variables that go up there match the missing values. *But a drawback is that adding the average these missing may not represent the true values of the participants, therefore can also be seen as unrepresentative of the actual subject whose values were missing.*
+
+**5. Clean the data set in whichever ways you see fit. This might mean adjusting *variable type*, for example from `character` to `factor`, or dealing with missing data. Assign your cleaned data set to a new data set named `hiphop_clean` -- use this data set going forward.**
+
+::: callout-tip
+Helpful functions: `mutate()`, `as.factor()`
+
+Likert scales (1-5) will be read by R as numeric values and MUST be converted to factors.
+
+It would be most efficient to use `across()` in combination with `mutate()` to complete this task.
+:::
+
+```{r}
+# code chunk for Q5
+hiphop_clean <- hiphop |>
+  mutate(across(where(is.character), as.factor) )
+
+# https://stackoverflow.com/questions/27668266/dplyr-change-many-data-types
+
+# Mutate function can change parts of dataset, across affects all columns. The where function locates any column data type that is a character function and the as.factor changes the column to a factor variable. 
+  
+```
+
+# Data Summaries
+
+**6. How many unique AAE words were studied in this data set?**
+
+::: callout-tip
+Helpful functions: `distinct()`, `count()`
+:::
+
+```{r}
+# code chunk for Q6
+hiphop_clean |>
+  distinct(word) |>
+  count()
+
+```
+
+**Updated Summary**
+
+In the code I pipeline the data frame into a distinct variable where it found the unique words in the word columns. When I pipeline the word column to the distinct() function, it creates a column of all the unique words with no repeats in the column. The count() function then counts how many items are in that column, giving a total of 64 words in the column, meaning there are 64 unique words.
+
+**7. Make a new variable that re-categorizes `ethnic` into only two groups, "white" and "non-white", to simplify your data.**
+
+::: callout-tip
+Helpful functions: `mutate()`, `if_else()`
+:::
+
+```{r}
+# code chunk for Q7
+hiphop_clean <- hiphop_clean |>
+  mutate(
+    ethnic_sorted = if_else(ethnic == "white", "white", "non-white")
+  )
+```
+
+Updated to be saved to be in hiphop_clean variable.
+
+**8. It is fairly common for researchers to collapse ethnic or racial categories similar to what you just did. What are some issues with representing the data in this way?**
+
+Some issues that may arise from representing the data is that generalizing the overall non-white population. There are many races included in the data that are not just white and are much more distinct. They should be separated into their own races even if the percentages are quite small. Therefore by collapsing ethnic or racial categories in this way can inaccurately represent non-white populations and generalize a diverse and large group.
+
+**9. What are the demographics of the people in this study? Investigate the variables `sex`, `age`, and `ethnic` and summarize your findings in 1-3 complete sentences.**
+
+::: callout-tip
+You'll need to first manipulate your data to have each person represented only once.
+
+Helpful functions: `select()`, `distinct(___, .keep_all = TRUE)`, `count()`, `summary()`
+:::
+
+```{r}
+# code chunk for Q9
+
+# For number summary
+hiphop_clean |>
+  select(subj, sex, age, ethnic) |>
+  distinct(subj, .keep_all = TRUE) |>
+  summary()
+
+# For a table
+hiphop_clean |>
+  select(subj, sex, age, ethnic) |>
+  distinct(subj, .keep_all = TRUE) |>
+  count(sex, age, ethnic)
+
+```
+
+From both the table and the graph I included, we can concluded that a majority of participants were white females under 18 since there were 36 partipants of the same demographic. In the summary statement we can even see that more participants were females, the mean age was around 20.02 years old, and majority of the participants were white females. There were 135 white participants 51 male participants and 117 female participants.
+
+**Updated Explanation**
+
+I chose to specify subject as since we are trying to distinctly find each one of the subject. If I didn't specify subject, there would be multiple data points with repeating information from the same subject 64 times. Sex, age, and ethnic counts would be multiplied by 64, which is not representative of the data.
+
+**10. Make at least two plots to display the demographic information of the subjects in this study.**
+
+::: callout-note
+You do not need to discuss these plots, but make sure they are appropriate to the data types and have informative titles and axis labels. Feel free to use the skills you learned in Challenge 2 to enhance your plots!
+:::
+
+```{r}
+# code chunk for Q10
+
+hiphop_clean_graph <- hiphop_clean |>
+  distinct(subj, .keep_all = TRUE)
+
+ggplot(data = hiphop_clean) +
+  geom_density_ridges(mapping = aes(x = age, y = ethnic, fill = ethnic)) +
+  labs(
+    x = "Age",
+    y = "Ethnic"
+  )
+
+ggplot(data = hiphop_clean_graph) +
+  geom_bar(mapping = aes(x = sex, fill = ethnic)) +
+  labs(
+    x = "Sex",
+    y = "Count"
+  )
+  
+  
+```
+
+**Update**
+
+I was able to combine the data set into one for the second graph, since there is not 10,752 subjects, but there are only 168 subjects. The ggridges was interesting because although the information on the hiphop_clean_graph is compacted, none of the other ethincities were being distributed like the original data set. I believe the reason for the data not showing up is likely because the scaling of the graph. Although placing the original data set into the ggridges works.
+
+## Familiar words
+
+For each demographic group listed below, determine which word(s) in this study was(were) the most **and** least familiar on average.
+
+::: callout-tip
+Helpful functions: `filter()`, `group_by()`, `summarize()`, `slice_max()`, `slice_min()`
+
+Useful variables: `word`, `familiarity`, `sex`, `age`, `ethnic`
+:::
+
+**11. People below the age of 20.**
+
+```{r}
+# code chunk for Q11
+
+# Filter out people under 20 years old, group into words, when we summarize with familiarity we can use mean() to group by the words associated using the familiarity score. Then slice_max and slice_min should get the highest average familiarity score and the lowest familiarity score.
+
+hiphop_clean |>
+  filter(age < 20) |>
+  group_by(word) |>
+  summarize(mean_words = mean(familiarity)) |>
+  slice_max(mean_words)
+
+hiphop_clean |>
+  filter(age < 20) |>
+  group_by(word) |>
+  summarize(mean_words0 = mean(familiarity)) |>
+  slice_min(mean_words0)
+  
+
+```
+
+**12. Non-white women.**
+
+```{r}
+# code chunk for Q12
+hiphop_clean |>
+  filter(ethnic != 'white', sex == "Female") |>
+  group_by(word) |>
+  summarize(mean_words1 = mean(familiarity)) |>
+  slice_max(mean_words1)
+
+hiphop_clean |>
+  filter(ethnic != 'white', sex == "Female") |>
+  group_by(word) |>
+  summarize(mean_words2 = mean(familiarity)) |>
+  slice_min(mean_words2)
+```
+
+**13. White men above the age of 30.**
+
+```{r}
+# code chunk for Q13
+hiphop_clean |>
+  filter(sex == 'Male', ethnic == 'white', age > 30) |>
+  group_by(word) |>
+  summarize(mean_words3 = mean(familiarity)) |>
+  slice_max(mean_words3)
+
+hiphop_clean |>
+  filter(sex == 'Male', ethnic == 'white', age > 30) |>
+  group_by(word) |>
+  summarize(mean_words4 = mean(familiarity)) |>
+  slice_min(mean_words4)
+```
+
+## Study Subjects
+
+A joke among the [Tidy Tuesday](https://www.tidytuesday.com/) community is that Justin Bieber was one of the subjects in this study. Bieber, a white male, from a relatively small town (10,000-60,000 people) in Ontario would have been 17-23 at the time of the study.
+
+**14. Determine which subject you believe is secretly Bieber, justify your answer.**
+
+::: callout-tip
+Refer again to the data set description. There is another clue about Bieber's identity.
+:::
+
+```{r}
+# code chunk for Q14
+hiphop_clean |>
+  filter(sex == 'Male', ethnic == 'white',
+           age > 17, age < 23,
+           city > 10000, city < 60000) |>
+  slice_max(bieber) |>
+  distinct(subj, .keep_all = TRUE)
+```
+
+Subject p17 was is likely the secret Bieber. Every constraint filtered out to be subject p17, with that subject being the only one left after being filtered out.
+
+**Update**
+
+After realizing that using "bieber == 5" would not be a good way to filter, especially if the person does not get recieve a 5 on bieber. With the slice_max it found the subject with the highest bieber score instead of trying to filter out 5.
+
+# Lab 3 Submission
+
+You will submit **only** your rendered HTML file. Your HTML file is required to have the following specifications in the YAML options (at the top of your document):
+
+-   be self-contained (`self-contained: true`)
+-   include your source code (`code-tools: true`)
+-   include all your code and output (`echo: true`)
+-   include **no** messages from loading in packages or the data (`messages: false`)
+
+**If any of the options are not included, your Lab 3 or Challenge 3 assignment will receive an "Incomplete" and you will be required to submit a revision.**
+
+# Challenge 3: Group Comparisons & Data Ethics
+
+## Published Comparisons
+
+In the published article ([You Know What It Is: Learning Words through Listening to Hip-Hop](https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0028248&type=printable)), the author presents a series of comparisons about the variables which most explain an individual's familiarity with African American English (AAE).
+
+Let us instead compare the number of artists participants reported liking for each genre. Specifically, you will determine which music genre most differentiates each of the demographic groups provided.
+
+> Which genre had much higher average (mean or median) reported artists in one group than the other.
+>
+> -   Male versus Female
+> -   White versus Non-White
+
+::: callout-tip
+You might find it helpful to first create a new data set with only the variables you are interested in! Look at the Music Variables in the data set description along with the demographics of interest.
+
+Helpful functions: `select()`, `group_by()`, `summarize()`, `across()`
+
+Other useful operations in R: `mean()`, `diff()`, `abs()`, `which.max()`
+:::
+
+## Study Design Critique -- Data Ethics
+
+Myself, members of the Tidy Tuesday community, and previous 331 students have voiced concerns regarding the design and social context of this study.
+
+You've already read the [data description (link)](http://conservancy.umn.edu/bitstream/handle/11299/116327/5/explanationAAEHiphopChesley.txt) regarding how participants were recruited for participation in this study. **Now**, you need to read additional details regarding aspects of the study in the published paper: [You Know What It Is: Learning Words through Listening to Hip-Hop](https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0028248&type=printable).
+
+> Based on the design of this study and its context (African American English), what are **at least two** concerns you have? Keep in mind this critique aligns with conversations regarding data ethics. Thus, your concerns need to address the racial aspects of the design of this study.
+
+# Challenge 3 Submission
+
+Your challenge should be submitted as a **separate file**, **not** at the bottom of your Lab 3 file. Please submit your rendered HTML file. You can copy and paste this code into a **new** Quarto file. Your Challenge 3 submission should only included code necessary for completing the Challenge, nothing else.
+
+You will submit **only** your rendered HTML file. Your HTML file is required to have the following specifications in the YAML options (at the top of your document):
+
+-   be self-contained (`self-contained: true`)
+-   include your source code (`code-tools: true`)
+-   include all your code and output (`echo: true`)
+-   include **no** messages from loading in packages or the data (`messages: false`)
+
+**If any of the options are not included, your Lab 3 or Challenge 3 assignment will receive an "Incomplete" and you will be required to submit a revision.**

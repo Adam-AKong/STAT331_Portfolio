@@ -1,0 +1,299 @@
+---
+title: "Lab 5"
+author: "Adam Kong"
+format:
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+exectue:
+  echo: true
+  error: true
+---
+
+## Revision Reflection
+
+This reflection won't be as long since there were not too many errors in this lab. One of the first errors I made in this lab were some stylistic choices such as keeping redundant information. This included information on the x-axis being in the title. Or information on the y-axis being in the legend. In the first steps, I didn't correct much but included more information about where this information came from and what information is actually being presented on the graph. I fixed what was on the plots and less of what was going on to create those plots.
+
+In the time series section I made two significant changes, first I changed fct_reorder to fct_reorder2. After looking up in the help files, it's clear that fct_reorder is made for 1-D and fct_reorder2 is intended for 2-D, which this graph is. The second change I made was to change the axis-labels to indicate the weight was in grams. I didn't indicate that at first but then I made this correction. Also changed the title around and fixed some axis.
+
+I made the most amount of changes in Weekly Captures. I found that I made most of my code more complicated than before. but using several other functions and ideas from the past weeks, I realized my code could be much simpler and easier to read instead. Here I also changed the axis labels on the plots, removing redundant information and making it easier to read. In step 1 I shortened my data, making it much more simpler to read and keeping the dates shorts into one data set instead. For step 2 in Weekly Captures I use dplyr and change the orders of the function before I plot my data. In the original submission I changed the functions in the ggplot code, but after seeing Professor Theobold's comment I thought of how much easier it would be to read to have it separated instead. Lastly I used dplyr mutate to change my data rather than use the \$ to get into a data set I was already in. This error was likely because of the select function at the end but I readjusted my code to make more sense and more straightforward. Another note I do want to say is Professor Theobold says for step 2 to use one dplyr function and two forcat functions. I used only one dplyr function and one forcat function to change the order.
+
+Lastly at the end I did find something interesting. Instead of using the day of the week, which I assume they had because this was an old data set and didn't have as many options available at the time like R studio does. I found the two graphs at the very bottom below what was asked in the lab was that by using lubridate and factor collapse we can achieve the same output in step 1 and 2. Since lubridate places the days of the week in order, I created a new data set and plotted an order data set, removing the need for the factor reordering in step 2. In step 3 since we have the same data set the output was the same. Only difference is color, since it automatically choose different colors. But overall I learned that the lubridate could be useful for the same thing as counting number of days. I think I have gained alot of knowledge about grouping and plotting data from this lab. Maybe a little adjustment to the arrangement but should be the same output.
+
+## **1. Revisiting Lab 2**
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(forcats)
+library(lubridate)
+```
+
+Import Data from Lab 2:
+
+```{r data}
+#| message: false
+# Code for question 1! 
+surveys <- read_csv(here::here("Week 2", "Lab 2", "surveys.csv"))
+```
+
+Graph Import
+
+```{r boxplot-jitter-points}
+#| warning: FALSE
+# Code for question 8 (and 9 and 10 and 11 and 12)! :) 
+ggplot(data = surveys, aes(x = weight, y = species)) +
+  geom_jitter(color = "tomato", alpha = 0.2) +  
+  geom_boxplot(outlier.shape = NA) + 
+  labs(
+    title = "Weight Distribution by Rodent Species",
+    x = "Weight (g)",
+    y = "Species")
+```
+
+**1. Reorder the species so the boxplots for weights go in descending order (largest to smallest).**
+
+```{r}
+ggplot(data = surveys, 
+       mapping = aes(weight, fct_reorder(species, weight))) +
+  geom_jitter(color = "tomato", alpha = 0.2) +  
+  geom_boxplot(outlier.shape = NA) +
+  labs(
+    title = "Weight Distribution by Rodent Species",
+    x = "Weight (g)",
+    y = "Species"
+  )
+```
+
+**2. Now that you've reordered, look at your y-axis label. That's long! Let's take Will Chase's advice and move the y-axis label to the top of the plot.**
+
+```{r}
+ggplot(data = surveys, 
+       mapping = aes(weight, fct_reorder(species, weight))) +
+  geom_jitter(color = "tomato", alpha = 0.2) +  
+  geom_boxplot(outlier.shape = NA) +
+  labs(
+    title = "Weight Distribution by Rodent Species",
+    x = "Weight (g)"
+  ) +
+  theme(
+    axis.title.y = element_blank()
+  )
+```
+
+## **2. Time-Series Plot**
+
+**1. Create a visualization how weights vary for each genus over the duration of the study.**
+
+```{r}
+#| message: false
+ggplot(data = surveys, mapping = aes(x = year, y = weight, color = genus)) +
+  geom_jitter()
+```
+
+**2. Calculate and plot the [mean]{.underline} weight for each genus for each year.**
+
+```{r}
+#| message: false
+mean_surveys <- surveys |>
+  group_by(year, genus) |>
+  summarise(mean_weight = mean(weight))
+
+ggplot(data = mean_surveys, mapping = aes(x = year, 
+                                          y = mean_weight, 
+                                          color = genus)) +
+  geom_jitter() +
+  geom_line() +
+  labs(
+    x = "Year",
+    y = "Mean Rodent Weight (g)",
+    color = "Rodent Genus"
+  )
+```
+
+**3. Reorder the lines so the mean weights go in descending order (largest to smallest).**
+
+```{r}
+#| message: false
+ggplot(data = mean_surveys, 
+       mapping = aes(x = year, 
+                     y = mean_weight, 
+                     color = fct_reorder2(genus, 
+                                          .x = year, 
+                                          .y = mean_weight,
+                                          .desc = TRUE))) +
+  geom_jitter() +
+  geom_line() +
+  labs(
+    x = "Year",
+    y = "Mean Rodent Weight (g)",
+    color = "Rodent Genus"
+  )
+
+# https://www.datanovia.com/en/blog/how-to-change-ggplot-legend-order/
+```
+
+**4. Now that you've reordered the lines, look at your legend's label. That's terrible! Let's give the legend a new title *and* move the information from the y-axis to the plot title.**
+
+```{r}
+#| message: false
+ggplot(data = mean_surveys, 
+       mapping = aes(x = year, 
+                     y = mean_weight, 
+                     color = fct_reorder2(genus, 
+                                          .x = year,
+                                          .y = mean_weight, 
+                                          .desc = TRUE))) +
+  geom_jitter() +
+  geom_line() +
+  labs(
+    title = "Average Rodent Weight (g) by Genus",
+    x = "Year",
+    color = "Rodent Genus"
+  ) +
+  theme(
+    axis.title.y = element_blank()
+  )
+```
+
+## **3. Captures Over the Week**
+
+**1. Create a visualization of the number of rodents captured each day of the week.**
+
+```{r}
+surveys_date <- surveys |>
+  group_by(day_of_week) |>
+  count(day_of_week)
+
+ggplot(data = na.omit(surveys_date), 
+       mapping = aes(x = day_of_week, 
+                     y = n, 
+                     fill = day_of_week)) +
+  geom_col() +
+  labs(
+    title = "Number of Rodents caught per Day",
+    x = "Day of the Week",
+    fill = "Day of the Week"
+  ) +
+  theme(
+    axis.title.y = element_blank()
+  )
+```
+
+**2. Change the order of the day of the week to go Monday through Sunday.**
+
+```{r}
+#| warning: false
+
+days_in_order <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+week_day <- surveys_date |>
+  mutate(day_of_week = fct(day_of_week, days_in_order))
+
+ggplot(data = na.omit(week_day), 
+       mapping = aes(x = day_of_week, 
+                     y = n, 
+                     fill = day_of_week)) +
+  geom_col() +
+  labs(
+    title = "Number of Rodents caught per Day",
+    x = "Day of the Week",
+    fill = "Day of the Week"
+  ) +
+  theme(
+    axis.title.y = element_blank()
+  )
+```
+
+**3. Collapse Monday through Friday into a `"Weekday"` level, and collapse Saturday and Sunday into a `"Weekend"` level. Plot the number of rodents captured between the two groups.**
+
+```{r}
+#| message: false
+#| warning: false
+dates_collapsed <- surveys_date|>
+  mutate(level = fct_collapse(day_of_week, 
+                              Weekday = c("Mon", 
+                                          "Tue", 
+                                          "Wed", 
+                                          "Thu", 
+                                          "Fri"), 
+                              Weekend = c("Sat", 
+                                          "Sun")))
+
+# https://stackoverflow.com/questions/56533740/how-to-save-collapsed-factor-levels-for-multiple-variables-into-new-dataframe
+# Thank you StackOverflow!
+
+dates_collapsed |>
+  group_by(level) |>
+  summarise(sum_level = sum(n))
+
+# Total number of rodents caught on weekdays and weekends
+
+ggplot(data = na.omit(dates_collapsed), 
+       mapping = aes(x = level, 
+                     y = n, 
+                     fill = level )) +
+  geom_col() +
+  labs(
+    title = "Number of Rodents caught during the Week",
+    fill = "Week Level"
+  ) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+# Extra Findings
+
+```{r}
+new_dates2 <- surveys |>
+  select(date) |>
+  mutate(change_date = wday(date, label=TRUE, abbr=FALSE)) |>
+  group_by(change_date) |>
+  count(change_date)
+
+ggplot(data = na.omit(new_dates2), 
+       mapping = aes(x = change_date, 
+                     y = n, 
+                     fill = change_date)) +
+  geom_col() +
+  labs(
+    title = "Number of Rodents caught per Day",
+    x = "Day of the Week",
+    fill = "Day of the Week"
+  ) +
+  theme(
+    axis.title.y = element_blank()
+  )
+```
+
+```{r}
+#| message: false
+dates_collapsed2 <- new_dates2|>
+  mutate(level = fct_collapse(change_date, 
+                              Weekday = c("Monday", 
+                                          "Tuesday", 
+                                          "Wednesday", 
+                                          "Thursday", 
+                                          "Friday"), 
+                              Weekend = c("Saturday", 
+                                          "Sunday")))
+
+# https://stackoverflow.com/questions/56533740/how-to-save-collapsed-factor-levels-for-multiple-variables-into-new-dataframe
+
+ggplot(data = na.omit(dates_collapsed2), 
+       mapping = aes(x = level, 
+                     y = n, 
+                     fill = level )) +
+  geom_col() +
+  labs(
+    title = "Number of Rodents caught during the Week",
+    fill = "Week Level"
+  ) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
