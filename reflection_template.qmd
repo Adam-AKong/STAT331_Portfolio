@@ -741,12 +741,18 @@ region_avocado |>
 
 ## Revising My Thinking
 
-I think a lot of my thinking in code has changed a lot throughout the course. I used to think that long and code meant the code was much better. But after revising my code many times I realized that shorter code is much better.
+I think a lot of my thinking in code has changed a lot throughout the course. I used to think that long and code meant the code was much better. But after revising my code many times I realized that shorter code is much better. My work and my revisions can be also seen in the challenges. Often times during the challenges I attempt to go beyond the expectations of this class by including additional information and including materials not taught in the regular courses into my assignments. But I've learned that perfection doesn't happen first try. I learnt after having to complete several revisions that striving to perfection is learning. I consider alot of what Professor Theobold and my peer reviews comment on my labs and assignments and try to fit those into my re submissions. A lot of the revision in the portfolio have come from redoing certain problems and understood what the comments meant for each one. Although maybe not all the code is perfect or even correct, I put in effort to try and revise my thinking in order to become a better programmer.
 
 ## Extending My Thinking
 
-<!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
+Throughout the course I take time trying to understand each concept. I dedicate a lot of time to understand concepts and try to use these concepts in the labs afterward. For new materials I first try to figure out new concepts and think of new ways of how I can implement these ideas into an assignment. Then if I can't understand a concept or idea, I'd try to reach out to professor Theobold or use the class Discord to ask questions about a part I don't understand. But most of my time on Discord I found that my other peers have already asked the same questions and I use those answer in my assignments. In my previous reflection, I even mentioned how I extended my thinking beyond the class by including an example from Challenge 1 where I added many more colors and changed the background. In addition I would like to add the ugly plot competition, since that was not part of the normal course but I showed my attempt at extended thinking.
 
 ## Peer Support & Collaboration
 
-<!-- Include an image of feedback you gave that you are proud of (either in a peer review or in Discord) -->
+![Answer to a Discord Question](images/Screenshot%202023-02-19%20090445-01.png)
+
+This paragraph was copied and pasted from another one of my reflections. However, I feel as if this does still reflect on how I did regarding peer support and collaboration.
+
+In the two practice activities, I took the roles of facilitator and recorder. During each practice activity I would make sure to engage with my peers and ensure that our group would discuss each problem. When I was the role of recorder I made sure to listen to each suggestion my peers made and made that edit. I noticed while working on the practice activity, when one member would want to correct another team member, that team member would wait for the other team member to finish talking before suggesting the correct solution.
+
+In the Discord I would sometimes ask questions, but I would also look on the Discord for help. So far I have only asked one question so far, but I like Discord because I can look at what other people asked and use those to answer some of the questions I had. I also participate in the Discord chat and try to answer questions whenever I know the answers. To go further I would test their solution, if they posted their code, and confirm whether it would be an issue on my end or their end.
