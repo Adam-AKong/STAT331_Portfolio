@@ -1,0 +1,42 @@
+---
+title: "Practice Activity 9.1 Regression"
+author: "Adam Kong"
+format: 
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+execute:
+  echo: true
+  error: true
+---
+
+## Stuff
+
+```{r}
+#| message: false
+library(tidyverse)
+
+mystery_animal <- read_csv(here::here("Week 9", "Practice Activity Stuff", "mystery_animal.csv"))
+```
+
+```{r}
+mystery_lm <- lm(weight_after ~ weight_before, data=mystery_animal)
+```
+
+```{r}
+mystery_lm$residuals |>
+  head(5)
+
+resid(mystery_lm) |>
+  head(5)
+
+broom::augment(mystery_lm)
+```
+
+```{r}
+mystery_lm |>
+  broom::augment() |>
+  ggplot(mapping = aes(x = .fitted, y = .resid)) +
+  geom_point()
+```
