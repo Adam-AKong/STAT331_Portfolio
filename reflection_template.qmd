@@ -33,7 +33,7 @@ avocado <- read_csv(here::here("Week 4", "Lab 4", "avocado.csv"))
 # Week 2: Practice Activity Q 1
 
 # Code to read in the ages.xlsx data goes here! 
-read_excel(here::here("Week 2", "Practice Activity", "Ages_Data", "ages.xlsx"))
+read_xlsx(here::here("Week 2", "Practice Activity", "Ages_Data", "ages.xlsx"))
 ```
 
 -   `txt`
@@ -168,16 +168,7 @@ combined_data <- cali_avocados |>
 -   `right_join()`
 
 ```{r wd-5-right}
-# Week 4: Lab 4 Q 2
 
-topFiveRegions <- metro_avocado |>
-  group_by(region) |>
-  summarise(mean_sold = mean(`Total Volume`)) |>
-  arrange(desc(mean_sold)) |>
-  slice_max(mean_sold, n = 5)
-
-graphFiveMetro <- avocado |>
-  right_join(topFiveRegions)
 ```
 
 -   `inner_join()`
@@ -368,12 +359,20 @@ ggplot(data = surveys, aes(x = species, y = weight)) +
 -   numeric variables
 
 ```{r dvs-1-num}
-# Week 1: Lab 1 Q 2
+# Week 2: Lab 2 Q 14
 
-dist <- cars[,2]
-hist(dist, xlab = "Stopping Distance in ft")
+ggplot(data = surveys, aes(x = species, y = weight)) +
+  geom_jitter(color = "darkseagreen") +
+  geom_boxplot(outlier.shape = NA) + 
+  labs(
+    title = "Weight Distribution in Grams by Species",
+    x = "Species"
+  ) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(angle=45)
+  )
 
-plot(cars, xlab = "Car Speed in MPH", ylab = "Stopping Distance in ft")
 ```
 
 -   numeric variables and categorical variables
@@ -397,24 +396,42 @@ ggplot(graphFiveMetro, aes(x = region, y = `Total Volume`, fill = region)) +
 -   categorical variables
 
 ```{r dvs-2-cat}
-# Week 3: Lab 3 Q 9
+# Week 5: Lab 5 Part 2 Q 3
 
-hiphop_clean |>
-  select(subj, sex, age, ethnic) |>
-  distinct(subj, .keep_all = TRUE) |>
-  count(sex, age, ethnic)
+ggplot(data = mean_surveys, 
+       mapping = aes(x = year, 
+                     y = mean_weight, 
+                     color = fct_reorder2(genus, 
+                                          .x = year, 
+                                          .y = mean_weight,
+                                          .desc = TRUE))) +
+  geom_point() +
+  geom_line() +
+  labs(
+    x = "Year",
+    y = "Mean Rodent Weight (g)",
+    color = "Rodent Genus"
+  )
 ```
 
 -   dates
 
 ```{r dvs-2-date}
-# Week 5: Practice Acticity 5 Lubridate Q 2
+# Week 5: Practice Lab 5 Part 3 Q 3
 
-suspects_clean <- suspects_clean |>
-  filter(!wday(Time.Spotted, label = TRUE, abbr = FALSE) %in% 
-           c("Tuesday", "Thursday")
-         )
-suspects_clean
+ggplot(data = drop_na(dates_collapsed), 
+       mapping = aes(x = level, 
+                     y = n, 
+                     fill = level )) +
+  geom_col() +
+  labs(
+    title = "Number of Rodents caught during the Week",
+    fill = "Week Level"
+  ) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
 ```
 
 **DVS-2: I use plot modifications to make my visualization clear to the reader.**
@@ -422,11 +439,14 @@ suspects_clean
 -   Example 1
 
 ```{r dvs-2-1}
-# Week 2: Lab 2 Q 14
+# Week 2: Lab 2 Q 14 (Revised)
 
 # Code for question 13! 
-ggplot(data = surveys, aes(x = weight, y = species)) +
-  geom_jitter(color = "cadetblue") +
+ggplot(data = surveys, 
+       aes(x = weight, 
+           y = species)) +
+  geom_jitter(color = "cadetblue", 
+              alpha = 0.2) +
   geom_boxplot(outlier.shape = NA) + 
   labs(
     title = "Weight Distribution by Species",
@@ -441,7 +461,7 @@ ggplot(data = surveys, aes(x = weight, y = species)) +
 -   Example 2
 
 ```{r dvs-2-2}
-# Week 5: Lab 5 Part 1 Q 3 (Revision)
+# Week 5: Lab 5 Part 1 Q 3 (Revision) (Revised x2)
 
 ggplot(data = mean_surveys, 
        mapping = aes(x = year, 
@@ -450,7 +470,7 @@ ggplot(data = mean_surveys,
                                           .x = year, 
                                           .y = mean_weight,
                                           .desc = TRUE))) +
-  geom_jitter() +
+  geom_jitter(alpha = 0.2) +
   geom_line() +
   labs(
     x = "Year",
@@ -536,11 +556,20 @@ hiphop |>
 -   Example 2
 
 ```{r dvs-5-2}
-# Week 4: Practice Activity 4: Military Q 2
+# Week 9: Lab 9 Q 9
 
-military_clean <- military |>
-  mutate(across(.cols = Country:`2019`, .fns = ~na_if(., "xxx")),
-         across(.cols = Country:`2019`, .fns = ~na_if(., ". .")))
+AllaninCAandPA <- names |>
+  filter(Year == 2000, 
+         Gender == "M",
+         Name %in% c("Alan", "Allan", "Allen"),
+         State %in% c("CA", "PA")) |>
+  group_by(State) |>
+  mutate(Prop = (Count/sum(Count))) |>
+  select(-Year, -Gender, -Count) |>
+  pivot_wider(names_from = c(Name),
+            values_from = Prop,
+            values_fill = 0)
+
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -574,15 +603,26 @@ region_avocado |>
 -   Example 1
 
 ```{r dvs-7-1}
+# Week 9: Challenge 9
 
-
-
+Allan_PA %>%
+  gt() %>%
+  cols_label(sum_Alan = "Alan",
+             sum_Allan = "Allan",
+             sum_Allen = "Allen") %>%
+  tab_header(title = "Proportion of 'Allan'",
+             subtitle = "from the State of Pennsylvania") %>% 
+  fmt_number(columns = 1:3, decimals = 3)
 ```
 
 -   Example 2
 
 ```{r dvs-7-2}
+# Week 9: Challenge 9
 
+preview_names <- names |>
+  head(100)
+DT::datatable(preview_names)
 ```
 
 ## Program Efficiency
@@ -614,22 +654,86 @@ military_clean <- military |>
 
 -   `map()` functions
 
-```{r pe-1-map-1 Not Yet Learned}
+```{r pe-1-map-1}
+# Week 8: Lab 8 Q 4
 
+xmas3 <- xmas2 %>%
+mutate(full_line = map_chr(.x = Day, 
+                           ~sing_day(xmas2, 
+                                     .x, 
+                                     Full.Phrase)))
 ```
 
 **PE-2: I can write functions to reduce repetition in my code.**
 
 -   Example 1
 
-```{r pe2-1 Not Yet Learned}
+```{r pe2-1}
+# Week 8: Lab 8 Q 3
 
+sing_day <- function(dataset, line, phrase_col){
+  
+  # Step 1: Setup the intro line
+  # Hint: You need to convert a number (e.g., 1) to a word (e.g., first)
+  num_word <- ordinal({{ line }})
+  
+  intro <- glue::glue("On the {num_word} day of Christmas, my true love sent to me:")
+  
+  # Step 2: Sing the gift phrases
+
+  phrases <- dataset |>
+    pull( {{phrase_col}} )
+  
+  if ({{ line }} == 1) {
+  combined_phrase <- str_flatten(phrases[{{ line }}:1], " ")
+  } else {
+  combined_phrase <- str_c(str_flatten(phrases[{{ line }}:2], " "), 
+                           "and",
+                           str_flatten(phrases[1], ""), 
+                           sep = " ")
+  }
+    
+  ## put it together
+  
+  final_line2 <- str_c(intro, 
+                      combined_phrase,
+                      sep = " ")
+  final_line <- str_c(final_line2, ".", sep = "")
+    
+  return(final_line)
+
+}
 ```
 
 -   Example 2
 
 ```{r pe2-2 Not Yet Learned}
+# Week 8: Lab 8 Q 2
 
+make_phrase <- function(day, num_word, item, verb, adjective, location) {
+  
+  ## Step 1: Replace NAs with blank strings
+  verb <- str_replace_na(verb, "")
+  adjective <- str_replace_na(adjective, "")
+  location <- str_replace_na(location, "")
+  
+  ## Step 2: If the day is larger than 1, the items need pluralized! 
+  if (day > 1){
+    item <- pluralize_gift(item)
+  }
+  
+  ## Step 3: If the day is 1, you need to add an "a" or "an" before the gift 
+  if (day == 1){
+    item <- str_c("a", item, sep = " ")
+    day <- str_c("")
+  } else{
+    day <- english(day)
+  }
+  
+  ## Step 4: Glue all of the pieces together to make a phrase! 
+  return(str_squish(glue("{day} {adjective} {item} {verb} {location}")))
+
+}
 ```
 
 **PE-3:I can use iteration to reduce repetition in my code.**
@@ -646,12 +750,21 @@ hiphop |>
 
 -   `map()` functions (Provide 2 Examples)
 
-```{r pe-3-map-1 Not Yet Learned}
+```{r pe-3-map-1}
+# Week 8: Lab 8 Q 4
+
+xmas3 <- xmas2 %>%
+mutate(full_line = map_chr(.x = Day, 
+                           ~sing_day(xmas2, 
+                                     .x, 
+                                     Full.Phrase)))
 
 ```
 
-```{r pe-3-map-2 Not Yet Learned}
+```{r pe-3-map-2}
+# Week 8: Lab 8 Q 1
 
+purrr::map_chr(xmas$Gift.Item, pluralize_gift)
 ```
 
 **PE-4: I can use modern tools when carrying out my analysis.**
@@ -661,7 +774,7 @@ hiphop |>
 ```{r pe-4-1} ?Not to sure if the class has gone over this section yet...}
 # Week 5: Lab 5 Part 3 Q 3
 
-ggplot(data = na.omit(dates_collapsed2), 
+ggplot(data = drop_na(dates_collapsed2), 
        mapping = aes(x = level, 
                      y = n, 
                      fill = level )) +
@@ -681,12 +794,10 @@ ggplot(data = na.omit(dates_collapsed2),
 ```{r pe-4-2}
 # Week 4: Lab 4 Q 4
 
-
 region_avocado |>
   separate(Date, c("Year", "Month", "Day")) |>
   group_by(Month) |>
   summarise(sold_mean = mean(`Total Volume`)) |>
-  arrange(desc(sold_mean)) |>
   slice_max(sold_mean)
 ```
 
@@ -696,28 +807,62 @@ region_avocado |>
 
 -   Example 1
 
-```{r dsm-1-1 Not Yet Learned}
+```{r dsm-1-1}
+# Week 9: Practice Activity 9.2 
 
+set.seed(1957)
+
+music_man <- function(n_tromb, n_cor, n_reed){
+  
+  trombones <- rnorm(n_tromb, mean = 4.6, sd = 0.8)
+  cornets <- runif(n_cor, min = 1.5, max = 3.5)
+  reeds <- rchisq(n_reed, df = 4)
+  
+  return(sum(trombones, cornets, reeds))
+  
+}
+
+my_weights <- map_dbl(.x = 1:1000, 
+                      .f = ~ music_man(n_tromb = 76, 
+                                       n_cor = 110, 
+                                       n_reed = 542 + 318 + 175)
+                      ) 
 ```
 
 -   Example 2
 
-```{r dsm-1-2 Not Yet Learned}
+```{r dsm-1-2}
+# Week 9: Practice Activity 9.2
 
+# Trumpet
+qunif(0.95, min = 1.5, max = 3.5)
+# Trombone
+qnorm(0.10, mean = 4.6, sd = 0.8)
+1 - pnorm(5, mean = 4.6, sd = 0.8)
+tromboneNum <- rnorm(100, mean = 4.6, sd = 0.8)
+
+sum(tromboneNum < 4)
+
+# Reed
+1 - pchisq(5, df = 4)
 ```
 
 **DSM-2: I can fit a linear regression and extract necessary summary measures.**
 
 -   Example 1
 
-```{r dsm-2-1 Not Yet Learned}
+```{r dsm-2-1}
+# Week 9: Lab 9 Q 4
 
+names_linear <- lm(TotalCount ~ Year, data=Allison_years)
 ```
 
 -   Example 2
 
-```{r dsm-2-2 Not Yet Learned}
+```{r dsm-2-2}
+# Week 9: Practice Activity 9.1 Regression
 
+mystery_lm <- lm(weight_after ~ weight_before, data=mystery_animal)
 ```
 
 ## Revising My Thinking
