@@ -1,0 +1,163 @@
+---
+title: "Challenge 7: Functions and Fish"
+author: "Adam Kong"
+format: 
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+execute:
+  echo: true
+  error: true
+---
+
+## Challenge 7: Functions and Fish
+
+So I didn't change too many things on this assignment. I readjusted the if else statement to be case_when instead. I also changed my plot to become more transparent at some points. I didn't understand by what Professor Theobold understand to the 2 standard deviations, but in case I made the default 0 below the case when function instead. Since I'd assume that could tell the reader that they have to put something in the function or understand that something needs to be the bounds.
+
+```{r library}
+#| message: false
+library(tidyverse)
+```
+
+```{r dataset}
+#| message: false
+fish <- read_csv(here::here("Week 7", "Lab 7", "BlackfootFish.csv"))
+```
+
+## **4 Challenge: Incorporating Multiple Inputs**
+
+A frequently used measurement for fish health is a "condition index." [(Wikepedia article)](https://en.wikipedia.org/wiki/Condition_index_in_fish) The following simple equation can be used to calculate the approximate condition index of a fish:
+
+## **4.1 Part 1**
+
+There are specific units required for the calculation of a condition index. Length must be in millimeters, and weight must be in grams. Inspect the `length` and `weight` variables to decide if you believe these are the correct units associated with these measurements---this will likely require Googling what "typical" measurements of trout are.
+
+### **Replacing Impossible Measurements with `NA`s**
+
+Based on your research, write function(s) to handle the unlikely / impossible measurements included in the dataset. Your function(s) should accept three inputs (1) a vector of measurements, (2) the minimum value you believe is "reasonable," and (3) the maximum value you believe is "reasonable." If a value falls outside these bounds, you should replace it with an `NA`.
+
+**Tip**
+
+If you are struggling with the structure of your function, I would suggest re-reading the [Mutating Function](https://r4ds.hadley.nz/functions.html#mutate-functions) section from *R for Data Science*.
+
+Use your function to modify the `length` and `weight` columns of the `BlackfootFish` dataset, removing values you believe are "unreasonable."
+
+Measurements are recorded in the incorrect weight. Correct measurements should be in millimeters (mm) and grams (g).
+
+```{r}
+# Converted from ounces to grams. Length appears to be measured in millimeters
+
+fish <- fish |>
+  mutate(weight = weight *28.35)
+```
+
+```{r}
+# Uses 2 SD if doesn't work Function
+
+range_num <- function(numbers, min_num = NA, max_num = NA) {
+  
+  stopifnot(is.numeric(numbers))
+  
+  mean_num <- mean(numbers, na.rm = TRUE)
+  sd_num <- sd(numbers, na.rm = TRUE)
+  
+  case_when(
+    is.na(min_num) ~ (mean_num - 2*sd_num),
+    is.na(max_num) ~ (mean_num + 2*sd_num)
+  )
+  
+  numbers[max_num < numbers | min_num > numbers] <- NA 
+  
+  
+  return(numbers)
+  
+}
+```
+
+```{r}
+# Uses 0 if doesn't work Function. Hope users would see there must be an error and would default to 0.
+
+range_num0 <- function(numbers, min_num = 0, max_num = 0) {
+  
+  stopifnot(is.numeric(numbers))
+  
+  numbers[max_num < numbers | min_num > numbers] <- NA 
+  
+  return(numbers)
+  
+}
+```
+
+```{r}
+replace_measures <- function(dataframe, variables) {
+  
+  stopifnot(is.data.frame(dataframe), is.vector(variables, mode = "character"))
+
+  dataframe <- dataframe |>
+    mutate(across(.cols = {{ variables }}, ~range_num(.x)))
+  
+  return(dataframe)
+}
+```
+
+```{r}
+replace_landw <- replace_measures(fish, c("length", "weight"))
+new_landw <- drop_na(replace_landw)
+```
+
+## **4.2 Part 2**
+
+Write a function which calculates the condition index of a fish, given inputs of weight and length.
+
+Note!
+
+Consider whether your function will accept vectors as inputs or if it will accept variable names as inputs!
+
+```{r}
+# Results that I should get.
+
+new_landw |>
+  select(weight, length) |>
+  mutate(newcol = (weight/length^3)*100)
+```
+
+```{r}
+# Place variables names with no quotation.
+replace_conditional <- function(dataframe, weight, length) {
+  
+  stopifnot(is.data.frame(dataframe))
+
+  dataframe <- dataframe |>
+    mutate(cond_index := ({{ weight }} / (({{ length }})^3)) * 100)
+  
+  return(dataframe)
+}
+```
+
+```{r}
+fish_clean <- replace_conditional(new_landw, weight, length)
+```
+
+## **4.3 Part 3**
+
+Make a thoughtful visualization of how fish conditions have varied over the duration of this study.
+
+This is a great opportunity to demonstrate what you've learned about visualizations thus far and to show off your creativity!
+
+```{r}
+ggplot(data = fish_clean) +
+  facet_wrap(~species) +
+  geom_jitter(mapping = aes(x = year, 
+                            y = cond_index, 
+                            color = section),
+              alpha = 0.25) +
+  labs(
+    title = "Conditional Index of Fish Distribution",
+    x = "Year",
+    y = "",
+    color = "Section"
+  )
+```
+
+Out of the four types of fish, Brown Trout and Rainbow Trout had the most varying condition index. Most of the fish condition indexes were normal. Johnsrud section had more abnormailities. One Rainbow Trout above 1.00 condition index.

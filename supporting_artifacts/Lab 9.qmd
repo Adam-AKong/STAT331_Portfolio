@@ -1,0 +1,269 @@
+---
+title: "Lab 9"
+author: "Adam Kong"
+format: 
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+execute:
+  echo: true
+  error: true
+---
+
+## **Lab 9: Baby Names**
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+## **2 Is my name not cool any more?**
+
+Let's take a look at how the name "Allison" has changed over time. As my name begins with "A", you should download the `StateNames_A.csv` dataset from the link above.
+
+```{r}
+#| message: false
+names <- read_csv(here::here("Week 9", "Lab 9", "StateNames_A.csv"))
+```
+
+## **3 Summarizing & Visualizing the Number of Allisons**
+
+1.  Make a summary table of the number of babies named "Allison" for each state and the sex of the baby. Specifically, the table should have the following qualities:
+
+-   each state should be its own row
+
+-   and each sex should have its own column
+
+-   if there were no babies born for that combination of state & sex there should be a 0 (not an `NA`)
+
+```{r}
+tables_sorted <- names |>
+  filter(Name == "Allison") |>
+  rename(Sex = Gender) |>
+  pivot_wider(names_from = c(Sex),
+              values_from = Count,
+              values_fill = 0) |>
+  group_by(State) |>
+  summarise(F = sum(F), M = sum(M))
+
+tables_sorted
+```
+
+**Difference between gender and sex**
+
+The dataset has a column titled `Gender`, which contains two values `"F"` and `"M"`, representing "Female" and "Male". The sex someone was assigned at birth is different from their gender identity [(definitions)](https://www.plannedparenthood.org/learn/gender-identity/sex-gender-identity). Thus, this variable should be renamed to `Sex` or `Sex at Birth`.
+
+2.  You should have seen in the table above that "Allison" is a name given overwhelmingly to babies assigned "female" at birth. So, create a new dataset named `allison_f` which contains **only** the babies assigned `F`emale at birth.
+
+```{r}
+allison_f <- tables_sorted |>
+  select(-M) |>
+  rename(Female = F)
+```
+
+**Danger**
+
+This should be the dataset you use for the remainder of the assignment!
+
+3.  Make a visualization showing how the popularity of the name "Allison" has changed over the years. To be clear, each year should have **one** observation--the total number of Allisons born that year.
+
+```{r}
+Allison_years <- names |>
+  filter(Name == "Allison") |>
+  group_by(Year) |>
+  summarise(TotalCount = sum(Count))
+```
+
+```{r}
+ggplot(data = Allison_years) +
+  geom_line(mapping = aes(x = Year, 
+                          y = TotalCount)) +
+  geom_point(mapping = aes(x = Year, 
+                           y = TotalCount)) +
+  labs(
+    title = "Number of Allisons in the United States from 1997 to 2014",
+    x = "Year",
+    y = ""
+  )
+```
+
+That's a lot of Allisons!
+
+## **4 Modeling the Number of Allisons**
+
+4.  Fit a linear model with the year as the explanatory variable, and the number of Allisons as the response. Similar to #3, each year should have **one** observation--the total number of Allisons born that year.
+
+    ```{r}
+    names_linear <- lm(TotalCount ~ Year, data=Allison_years)
+    names_linear
+
+    ```
+
+5.  Write out the estimated regression equation.
+
+    Popularity of Allison over the years:
+
+    f(Year) = -101.6(Year) + 209815.1
+
+6.  Plot the *residuals* of the model, that is, the actual values minus the predicted values. Comment on the residuals - do you see any patterns?
+
+    ```{r}
+    names_linear |>
+      broom::augment() |>
+      ggplot(mapping = aes(x = .fitted, y = .resid)) +
+      geom_point()
+    ```
+
+**Tip**
+
+The `augment()` function from the **broom** package may be helpful!
+
+7.  What do you conclude from this model? Is my name not cool anymore
+
+    This residuals plot is interesting. It almost appears that every year the popularity of the name appears to fluctiate between residuals. The linear model appears to be accurate because it does these changes. This residual plot does confirm that there appears to be some decline in the use of the name "Allison".
+
+## **5 Spelling by State**
+
+In middle school I was **so** upset with my parents for not naming me "Allyson". Past my pre-teen rebellion, I'm happy with my name and am impressed when baristas spell it "Allison" instead of "Alison". But I don't have it as bad as my good friend Allan!
+
+8.  Narrow the A name dataset (downloaded previously) down to only male-assigned babies named "Allan", "Alan", or "Allen". Make a plot comparing the popularity of these names over time.
+
+    ```{r}
+    #| message: false
+    Allan_years <- names |>
+      filter(Name == c("Allan", "Alan", "Allen"), 
+             Gender == "M") |>
+      group_by(Name, Year) |>
+      summarise(total_count = sum(Count), .groups = "keep")
+
+    ggplot(data = Allan_years) +
+      geom_line(mapping = aes(x = Year,
+                              y = total_count,
+                              color = Name)) +
+      geom_point(mapping = aes(x = Year,
+                               y = total_count,
+                               color = Name)) +
+      labs(
+        title = "Popularity of spellings of 'Alan' over the Years",
+        x = "Year",
+        y = ""
+      )
+    ```
+
+**Filtering multiple values**
+
+It looks like you want to filter for a vector of values. What tools have you learned which can help you accomplish this task?
+
+9.  In California, Allan's spelling of his name is the least common of the three but perhaps it's not such an unusual name for his home state of Pennsylvania. Compute the total number of babies born with each spelling of "Allan" in the year 2000, in Pennsylvania and in California. Specifically, the table should have the following qualities:
+
+-   each spelling should be its own column
+
+-   each state should have its own row
+
+-   a `0` (not an `NA`) should be used to represent locations where there were no instances of these names
+
+    ```{r}
+    #| message: false
+
+    # total_count include all states. Will find proportion seperately.
+
+    Allan_wide <- names |>
+      filter(Name == c("Alan", "Allan", "Allen")) |>
+      mutate(prop = Count / sum(Count)) |>
+      group_by(Name) |>
+      pivot_wider(names_from = c(Name),
+                values_from = prop,
+                values_fill = 0)
+    ```
+
+10. Convert your total counts to overall percents. That is, what was the percent breakdown between the three spellings in CA? What about in PA?
+
+    ```{r}
+    # Include 2000s only here.
+
+    Allan_2000 <- names |>
+      filter(Name == c("Alan", "Allan", "Allen"), Year == 2000) |>
+      mutate(prop = Count / sum(Count)) |>
+      group_by(Name) |>
+      pivot_wider(names_from = c(Name),
+                values_from = prop,
+                values_fill = 0) |>
+      summarise(sum_Alan = sum(Alan), 
+                sum_Allan = sum(Allan),
+                sum_Allen = sum(Allen))
+
+    # Include only in California
+
+    Allan_CA <- names |>
+      filter(Name == c("Alan", "Allan", "Allen"), State == "CA") |>
+      mutate(prop = Count / sum(Count)) |>
+      group_by(Name) |>
+      pivot_wider(names_from = c(Name),
+                values_from = prop,
+                values_fill = 0) |>
+      select(Year, State, Alan, Allan, Allen) |>
+      summarise(sum_Alan = sum(Alan), 
+                sum_Allan = sum(Allan),
+                sum_Allen = sum(Allen))
+
+    # Include only in Pennysylvania
+
+    Allan_PA <- names |>
+      filter(Name == c("Alan", "Allan", "Allen"), State == "PA") |>
+      mutate(prop = Count / sum(Count)) |>
+      group_by(Name) |>
+      pivot_wider(names_from = c(Name),
+                values_from = prop,
+                values_fill = 0) |>
+      select(Year, State, Alan, Allan, Allen) |>
+      summarise(sum_Alan = sum(Alan), 
+                sum_Allan = sum(Allan),
+                sum_Allen = sum(Allen))
+    ```
+
+Proportion of Names found in 2000 (All States)
+
+```{r}
+Allan_2000
+```
+
+Proportion of Allan spellings in California (All Years)
+
+```{r}
+Allan_CA
+```
+
+Proportion of Allan spellings in Pennysylvania (All Years)
+
+```{r}
+Allan_PA
+```
+
+I interpreted the question as being separate each filter for year, California, and Pennsylvania.
+
+Overall the name Allan is statistically low. Alan is the most common name in all categories. The spelling of Alan and Allen however, statistically differ between California and Pennsylvania. In Pennsylvania, the spelling Allen was near the same proportions as the spelling of Alan. This is an interesting statistics
+
+In the California data set the name Alan, was above the 2000 proportion. The spelling Allan was statistically more likely to be spelled "Alan" in California. But overall Alan was the likely spelling but in Pennsylvania, the spelling "Allen" was much closer to the likelier spelling "Alan".
+
+Allan's In California and Pennsylvania:
+
+```{r}
+AllaninCAandPA <- names |>
+  filter(Year == 2000, 
+         Gender == "M",
+         Name %in% c("Alan", "Allan", "Allen"),
+         State %in% c("CA", "PA")) |>
+  group_by(State) |>
+  mutate(Prop = (Count/sum(Count))) |>
+  select(-Year, -Gender, -Count) |>
+  pivot_wider(names_from = c(Name),
+            values_from = Prop,
+            values_fill = 0)
+
+AllaninCAandPA
+```
+
+### **Submission**
+
+Submit you Lab 9 **before** you complete Challenge 9, so I can see what you added to your assignment for the Challenge.

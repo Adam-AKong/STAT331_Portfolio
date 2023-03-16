@@ -1,0 +1,238 @@
+---
+title: "Lab 7: Functions and Fish"
+author: "Adam Kong"
+format: 
+  html:
+    self-contained: true
+    code-tools: true
+    code-fold: true
+execute:
+  echo: true
+  error: true
+---
+
+## Reflection on Revisions
+
+For this lab I did not do as many revisions. First some of the suggestions were to make sure every named argument is used. For that I put in the default values that have no effect on the final across statements from the functions prior to revisions. Next I changed the title to reflect more of where and what the graph is describing from the data set. This included describing what was in the data set and where the values were from for more context from the reader. I then changed the bar plot to a density plot to measure the frequency. I originally tried line, jitter, point. Then I realized that box plots and density graphs give the best representation to the readers that the only aspect that changed was the scale. I gave eight graphs of the same thing, one divided by fish species and the other with the overall. With the fish species I believe that was much easier to see overall. Finally, the last change I made was to the vector in the rescale_column function. Originally I placed a vector of characters, but after redoing the code I realized it was redundant to include this additional check, because the rescale_01 has similar checks. Therefore even though the vector with character works, it's unnecessary when you can place the columns directly into function.
+
+## Lab 7: Functions and Fish
+
+```{r library}
+#| message: false
+library(tidyverse)
+```
+
+```{r dataset}
+#| message: false
+fish <- read_csv(here::here("Week 7", "Lab 7", "BlackfootFish.csv"))
+```
+
+## **2.1 Summarizing Missing Data**
+
+The measurements of each fish captured were taken by a Biologist on a raft. This lack of "laboratory setting" opens the door to the possibility of measurement errors.
+
+-   What variable(s) have missing values present?
+
+-   How many observations within each variable have missing values?
+
+```{r}
+fish |>
+  summarise(across(.cols = everything(vars = NULL), .fns = ~sum(is.na(.x))))
+```
+
+There only variable with missing values is weight. Of that column there are a total missing 1,796 cells in weight that is missing a variable.
+
+**Note**
+
+Output both pieces of information in *one* table!
+
+## **2.2 Visualizing Missing Data**
+
+Unfortunately, these missing values are not for only one `year`, `trip`, or `section` of river.
+
+Create a thoughtful visualization exploring the frequency of missing values across the different years, sections, and trips.
+
+**Tip**
+
+This is a great opportunity to demonstrate what you've learned about visualizations thus far and to show off your creativity!
+
+```{r}
+#| warning: false
+
+fish_plot <- fish |>
+  group_by(year, trip, section) |>
+  filter(is.na(weight) == TRUE) |>
+  count(is.na(weight))
+
+ggplot(data = fish_plot) +
+  geom_col(mapping = aes(x = as.factor(year), 
+                         y = n, 
+                         fill = as.factor(trip))) +
+  facet_wrap(~section) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+  labs(
+    title = "Counts of Missing Weight by Section from Blackfoot River Fish",
+    x = "Years",
+    y = "",
+    fill = "Trip"
+  )
+
+```
+
+# **3 Part Two: Adjusting the Data (Function Writing)**
+
+If I wanted to rescale every quantitative variable in my dataset so that the variables have values between 0 and 1. I could use the following formula
+
+The following `R` code would carry out this rescaling procedure for the `length` and `weight` columns of the data:
+
+```{r}
+BlackfootFish <- BlackfootFish |> 
+  mutate(length = (length - min(length, na.rm = TRUE)) / 
+           (max(length, na.rm = TRUE) - min(length)), 
+         weight = (weight - min(weight, na.rm = TRUE)) / 
+           (max(weight, na.rm = TRUE) - min(length, na.rm = TRUE))
+         )
+```
+
+This process of duplicating an action multiple times makes it difficult to understand the intent of the process. Additionally, it makes it very difficult to spot the mistakes. *Did you spot the mistake in the weight conversion?*
+
+Often you will find yourself in the position of needing to find a function that performs a specific task, but you do not know of a function or a library that would help you. You could spend time Googling for a solution, but in the amount of time it takes you to find something you could have already written your own function!
+
+## **3.1 Writing a Function**
+
+Let's transform the repeated process above into a `rescale_01()` function.
+
+-   The function should take a single vector as its input.
+
+-   The function should return the rescaled vector.
+
+**Tip**
+
+Think about the "efficiency" of your function. Are you calling the **same** function multiple times?
+
+```{r}
+rescale_01 <- function(vector) {
+  
+  stopifnot(is.numeric(vector), length(vector) > 1)
+  
+  min_num <- min(vector, na.rm = TRUE)
+  max_num <- max(vector, na.rm = TRUE)
+  
+  vector = (vector - min_num) / (max_num - min_num)
+  
+  return(vector)
+         
+}
+```
+
+## **3.2 Adding Stops**
+
+Now, let's incorporate some checks into your function! Modify your previous code to create the following checks:
+
+-   the function should stop if the input vector is not numeric
+
+-   the function should stop if the length of the vector is not greater than 1
+
+## **3.3 Performing a Simple Test**
+
+First, test your function on the simple vector below. **Add code** that verifies the maximum of your rescaled vector is 1 and the minimum is 0!
+
+**Yes, you need to add code here!**
+
+```{r}
+x <- c(1:85, NA)
+
+test <- rescale_01(x)
+
+min(test, na.rm = TRUE)
+max(test, na.rm = TRUE)
+
+```
+
+## **3.4 Performing a More Difficult Test**
+
+Next, let's test the function on the `length` column of the `BlackfootFish` dataset.
+
+Make plots of the original values of `length` and the rescaled values of `length`. Output your plots **stacked vertically**, so the reader can confirm the only aspect that has changed is the scale.
+
+**Tip**
+
+By stacked vertically, I mean that the x-axis of the two plots should be stacked on top of each other!
+
+```{r}
+#| layout-ncol: 2
+
+rescaled_fish <- fish |>
+  mutate(scaled_length = rescale_01(length))
+
+ggplot(data = rescaled_fish) +
+  geom_density(mapping = aes(x = length, fill = species))
+
+ggplot(data = rescaled_fish) +
+  geom_boxplot(mapping = aes(x = length, fill = species))
+
+ggplot(data = rescaled_fish)  +
+  geom_density(mapping = aes(x = scaled_length, fill = species))
+
+ggplot(data = rescaled_fish)  +
+  geom_boxplot(mapping = aes(x = scaled_length, fill = species))
+
+ggplot(data = rescaled_fish) +
+  geom_density(mapping = aes(x = length))
+
+ggplot(data = rescaled_fish) +
+  geom_boxplot(mapping = aes(x = length))
+
+ggplot(data = rescaled_fish)  +
+  geom_density(mapping = aes(x = scaled_length))
+
+ggplot(data = rescaled_fish)  +
+  geom_boxplot(mapping = aes(x = scaled_length))
+```
+
+## **3.5 Incorportaing Variables**
+
+Suppose you would like to make a more general `rescale_column()` function that perform operations on any variable within a dataset. Ideally, your function would take a dataframe and a variable name as inputs and return a dataframe where the variable has been rescaled.
+
+Create a `rescale_column()` that accepts two arguments:
+
+1.  a dataframe
+
+2.  the name(s) of the variable(s) to be rescaled
+
+The body of the function should call the original `rescale_01()` function you wrote previously.
+
+**Tip**
+
+If you are struggling with this task, I would recommend re-reading the [Data frame functions](https://r4ds.hadley.nz/functions.html#data-frame-functions) section from *R for Data Science*.
+
+```{r}
+# If someone mispells a name or tries to call a variable that doesn't exist, then R will tell them it does not exists. No need to check if variables in vectors are numeric since that check already exists in the previous function rescale_01.
+
+rescale_column <- function(dataframe, variables) {
+  
+  stopifnot(is.data.frame(dataframe))
+
+  dataframe <- dataframe |>
+    mutate(across(.cols = {{ variables }}, 
+                  .fns = ~rescale_01(.x),
+                  .names = NULL))
+  
+  return(dataframe)
+}
+```
+
+**3.6 Another Function Test**
+
+Alright, now let's put your `rescale_column()` function to work! Use your `rescale_column()` function to rescale **both** the `length` and `weight` columns.
+
+**Danger**
+
+I expect that you carry out this process by calling the `rescale()` function *one* time!
+
+I advise against using functions like `mutate_at()`, which have been superseded.
+
+```{r}
+scaled_fish <- rescale_column(fish, c(length, weight))
+scaled_fish
+```
