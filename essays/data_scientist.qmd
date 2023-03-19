@@ -4,4 +4,14 @@ format: html
 editor: visual
 ---
 
-I feel that I have grown as a data scientist because of how my brain processes these new concepts from R differently. At the beginning of this quarter I had no idea what R, Dplyr, or Tidyverse was. In general, the only R Studio experience I had was in STAT 305 with professor Rossman. From that class I assumed that R Studio was only like a lighter version of Python with no capability of storing new forms of data and being a niche programming community.
+## My Growth as a Data Scientist
+
+I feel that I have grown as a data scientist because of how my brain processes these new concepts from R differently. At the beginning of this quarter I had no idea what R, Dplyr, or Tidyverse was. The only R Studio experience I had was in STAT 305 with professor Rossman. From that class I assumed that R Studio was only like a lighter version of Python with no capability of storing new forms of data and only having a niche programming community. I had a very specific idea of what R was capable of doing and didn't understand fully that R was capable of a large amount of utilities.
+
+Concepts I didn't think would appear in R did. Such as data tables, vectors, lists, and cat functions. All of these I have seen in previous classes. I did not think the class would be manipulating these tables, changing columns, or pivoting rows to new columns. I also learned more as a data scientist to tidy the data table and creating more readable data tables for the readers. Here I assumed that as a data scientist that we would only work for the back end of data sets, where other would not read and it was only for one data scientist or a group of data scientist to understand. From this class I learned from all the learning objectives this quarter that once I learnt to work with the data, as from the first section of the learning targets, than we work our way to visualize and simulate the data for non-data scientist.
+
+I think my learning shows the most in lab four and beyond. Lab four caused me the most amount of stress and was probably the most impactful to my learning as it caused me to understand data tables. This is the lab where I learned the most about working with data. I learned to import data, select columns, filter, mutate, summaries and group. Most of my labs are reproducible and professional looking.
+
+In lab seven and lab five display my knowledge on data visualization and summarizing the data. Both data sets in are sorted, filtered, and used creative graphs to display the data the viewer would likely want. Only including necessary data and easy readability. In lab and challenge nine I used displayed necessary data tables and created linear models. In lab eight I use so functions to sing the Christmas song, as it was repetitive in displaying lines and was necessary to reduce repetition.
+
+In conclusion I believe that my growth as a data scientist is displayed within all my reflection documents and my supporting artifacts document. I believe that many of the learning targets from my time in the class were met and I felt that as a data scientist my knowledge in the field has improved.

@@ -3,3 +3,25 @@ title: "Lightening Round Essays"
 format: html
 editor: visual
 ---
+
+## Lightening Round
+
+-   \"If Giovanni doesn\'t earn an A, then nobody should, because he had a very full understanding of all the learning targets for this class.\"
+
+he reason why I choose Giovanni for finishing this sentence because I was in the same group as him and I saw how he understood the concepts of R well. Not only did he help the group, but I've seen help others in class when they struggle on a problem. When I had questions when we were working on a group together, he explained to me his step by step process on how he got the answer he got. That is why if Giovanni doesn't get an A and he put all that work and effort into his projects, then I can't see how anyone could top that standard / expectation in this course.
+
+-   What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
+
+The most difficult part of the class was lab 4 and Dplyr. I wouldn't say the lab itself was difficult, but the concepts we were learning from that was. Understanding how to change data tables and mutating certain columns was a difficult concept for me. Another challenge for me was the strings from Lab 8. Trying not to use for loops was hard and using the map function, a new concept, was difficult to complete for me since I had no idea what I was doing during the lab. Lab nine slightly difficult for me because I didn't quite understand the instructions, but I resubmitted the lab nine with the correct filter and realized that == doesn't work the same as %in%. Overall, there were some hiccups in STAT 331, but I overcame those problems and got past the lab assignments.
+
+-   What was the easiest part of the class for you? Explain why.
+
+The first part of the STAT 331 was the easiest for me. Because I had some basic coding knowledge so I was able to understand some of the beginner materials such as the beginner vectors and data table. The second easiest material I found in the class was functions, strings, and base R functions. I learned some base R from STAT 305 and I learned the functions and strings from CPE 101. This class was challenging for me overall.
+
+-   What part of the class surprised or interested you the most? Explain why.
+
+I was surprised and interested in the application of the large data set. As I said in the data scientist essay, I was quite surprised with R Studio's capabilities. The way it can handle such large data sets with tens of thousands of rows of data. But the main reason for my surprise was because I was only shown base R function so I didn't think R could be such a strong language.
+
+-   Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+
+I would recommend reaching out to learn more about concepts that students can't understand. Especially during Dplyr or week four, I'd recommend reaching out because it might be hard to understand conceptually. Another thing I recommend is to use the Discord to ask question to classmates and Professor Theobold. Finally, be prepared to have a completely different understanding of data tables and data sets by the end of this class. I was not prepared to think of data tables this way.

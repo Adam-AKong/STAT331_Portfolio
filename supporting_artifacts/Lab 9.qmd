@@ -70,22 +70,26 @@ This should be the dataset you use for the remainder of the assignment!
 
 ```{r}
 Allison_years <- names |>
-  filter(Name == "Allison") |>
+  filter(Name == "Allison", 
+         Gender == "F") |>
   group_by(Year) |>
   summarise(TotalCount = sum(Count))
 ```
 
 ```{r}
 ggplot(data = Allison_years) +
-  geom_line(mapping = aes(x = Year, 
-                          y = TotalCount)) +
   geom_point(mapping = aes(x = Year, 
                            y = TotalCount)) +
+  geom_line(mapping = aes(x = Year, 
+                          y = TotalCount)) +
   labs(
     title = "Number of Allisons in the United States from 1997 to 2014",
-    x = "Year",
     y = ""
-  )
+  ) +
+  scale_x_continuous("Year",
+                     breaks = c(1997:2014),
+                     labels = c(1997:2014))
+  
 ```
 
 That's a lot of Allisons!
@@ -132,8 +136,8 @@ In middle school I was **so** upset with my parents for not naming me "Allyson
     ```{r}
     #| message: false
     Allan_years <- names |>
-      filter(Name == c("Allan", "Alan", "Allen"), 
-             Gender == "M") |>
+      filter(Name %in% c("Allan", "Alan", "Allen"), 
+             Gender %in% "M") |>
       group_by(Name, Year) |>
       summarise(total_count = sum(Count), .groups = "keep")
 
@@ -169,7 +173,7 @@ It looks like you want to filter for a vector of values. What tools have you lea
     # total_count include all states. Will find proportion seperately.
 
     Allan_wide <- names |>
-      filter(Name == c("Alan", "Allan", "Allen")) |>
+      filter(Name %in% c("Alan", "Allan", "Allen")) |>
       mutate(prop = Count / sum(Count)) |>
       group_by(Name) |>
       pivot_wider(names_from = c(Name),
@@ -178,73 +182,6 @@ It looks like you want to filter for a vector of values. What tools have you lea
     ```
 
 10. Convert your total counts to overall percents. That is, what was the percent breakdown between the three spellings in CA? What about in PA?
-
-    ```{r}
-    # Include 2000s only here.
-
-    Allan_2000 <- names |>
-      filter(Name == c("Alan", "Allan", "Allen"), Year == 2000) |>
-      mutate(prop = Count / sum(Count)) |>
-      group_by(Name) |>
-      pivot_wider(names_from = c(Name),
-                values_from = prop,
-                values_fill = 0) |>
-      summarise(sum_Alan = sum(Alan), 
-                sum_Allan = sum(Allan),
-                sum_Allen = sum(Allen))
-
-    # Include only in California
-
-    Allan_CA <- names |>
-      filter(Name == c("Alan", "Allan", "Allen"), State == "CA") |>
-      mutate(prop = Count / sum(Count)) |>
-      group_by(Name) |>
-      pivot_wider(names_from = c(Name),
-                values_from = prop,
-                values_fill = 0) |>
-      select(Year, State, Alan, Allan, Allen) |>
-      summarise(sum_Alan = sum(Alan), 
-                sum_Allan = sum(Allan),
-                sum_Allen = sum(Allen))
-
-    # Include only in Pennysylvania
-
-    Allan_PA <- names |>
-      filter(Name == c("Alan", "Allan", "Allen"), State == "PA") |>
-      mutate(prop = Count / sum(Count)) |>
-      group_by(Name) |>
-      pivot_wider(names_from = c(Name),
-                values_from = prop,
-                values_fill = 0) |>
-      select(Year, State, Alan, Allan, Allen) |>
-      summarise(sum_Alan = sum(Alan), 
-                sum_Allan = sum(Allan),
-                sum_Allen = sum(Allen))
-    ```
-
-Proportion of Names found in 2000 (All States)
-
-```{r}
-Allan_2000
-```
-
-Proportion of Allan spellings in California (All Years)
-
-```{r}
-Allan_CA
-```
-
-Proportion of Allan spellings in Pennysylvania (All Years)
-
-```{r}
-Allan_PA
-```
-
-I interpreted the question as being separate each filter for year, California, and Pennsylvania.
-
-Overall the name Allan is statistically low. Alan is the most common name in all categories. The spelling of Alan and Allen however, statistically differ between California and Pennsylvania. In Pennsylvania, the spelling Allen was near the same proportions as the spelling of Alan. This is an interesting statistics
-
-In the California data set the name Alan, was above the 2000 proportion. The spelling Allan was statistically more likely to be spelled "Alan" in California. But overall Alan was the likely spelling but in Pennsylvania, the spelling "Allen" was much closer to the likelier spelling "Alan".
 
 Allan's In California and Pennsylvania:
 

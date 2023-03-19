@@ -3,3 +3,11 @@ title: "The Power of Efficiency"
 format: html
 editor: visual
 ---
+
+## The Power of Efficiency
+
+Finding "efficiency" in statistical computing is finding efficient ways to reduce computing time on analyzing data in R Studio. In terms of coding efficiency is having the least amount of lines in R, since that requires less coding power. Some prime examples of this efficiency is the across function in R. This is especially very efficient since it was able to select all wanted columns instead of having to specify columns in the actual code itself. With the across function I could find all columns that were numeric or a specific type of columns.
+
+Efficiency allows me to write code efficiently and make data sets easier to understand. Efficiency is important because we want the fastest and easiest way to understand code for coders and readers. One example or "a-ha" moment I had with efficient code is when peer review code. I realized that some people's code was so readable was because the had simple and efficient code I could understand. Lab four had a lot of "Aha" moments because of how many new things I had to learn from Dplyr functions especially all the necessary joins. Lab two and three was the beginning of the "Aha" moments, but it's where I started seeing and writing better and efficient code.
+
+Lab five, seven, eight, and nine is where I start learning and applying those efficient coding tricks. But any challenges, practice activity, or in class activity I learn the efficient coding tricks. Any challenges I complete become much more efficient than the lab it was based off of. It sometimes took me hours to figure how to solve the challenge and make it more efficient so that anyone peer reviewing my code could take a look at it and understand my intentions with the code. Also why this comments are so important in coding.

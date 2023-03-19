@@ -233,7 +233,6 @@ recreate_graph <- cali_avocados |>
                values_to = "Avocado_Sold") |>
   group_by(region, type, `Avocado Size`) |>
   summarise(mean_sold = mean(Avocado_Sold)) |>
-  arrange(desc(`Avocado Size`)) |>
   mutate(`Avocado Size`= factor(`Avocado Size`, level = c('Small',
                                                           'Large',
                                                           'ExtraLarge')))

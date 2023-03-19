@@ -127,7 +127,7 @@ ggplot(data = mean_surveys,
                                           .x = year, 
                                           .y = mean_weight,
                                           .desc = TRUE))) +
-  geom_point() +
+  geom_point(alpha = 0.2) +
   geom_line() +
   labs(
     x = "Year",
