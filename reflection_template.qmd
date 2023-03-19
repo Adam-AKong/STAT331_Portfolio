@@ -22,18 +22,22 @@ execute:
 -   `csv`
 
 ```{r wd-1-csv}
-# Week 4: Lab 4 Q 0
+# Week 7: Lab 7 Q 0
 
-avocado <- read_csv(here::here("Week 4", "Lab 4", "avocado.csv"))
+fish <- read_csv(here::here("Week 7", 
+                            "Lab 7", 
+                            "BlackfootFish.csv"))
 ```
 
 -   `xlsx`
 
 ```{r wd-1-xlsx}
-# Week 2: Practice Activity Q 1
+# Week 2: Practice Activity Data Import Q 1
 
-# Code to read in the ages.xlsx data goes here! 
-read_xlsx(here::here("Week 2", "Practice Activity", "Ages_Data", "ages.xlsx"))
+read_xlsx(here::here("Week 2", 
+                     "Practice Activity", 
+                     "Ages_Data", 
+                     "ages.xlsx"))
 ```
 
 -   `txt`
@@ -41,13 +45,16 @@ read_xlsx(here::here("Week 2", "Practice Activity", "Ages_Data", "ages.xlsx"))
 ```{r wd-1-txt}
 # Week 5: Practice Activity 5.1 regex Setup
 
-message <- read_csv(here::here("data", "scrambled_message.txt"))
+message <- read_tsv(here::here("Week 5",
+                               "Practice Activity 5",
+                               "data", 
+                               "scrambled_message.txt"))
 ```
 
 **WD-2: I can select necessary columns from a dataset.**
 
 ```{r wd-2}
-# Week 3: Lab 3 Q 9
+# Week 3: Lab 3 Q 9 (Revised)
 
 hiphop_clean |>
   select(subj, sex, age, ethnic) |>
@@ -104,15 +111,10 @@ suspects_clean <- suspects |>
 -   numeric
 
 ```{r wd-4-numeric}
-# Week 4: Lab 4 Q 6 (Revision)
+# Week 7: Challenge 7 Q 4.1
 
-cali_organic_convention <- cali_avocados |>
-  group_by(type, region) |>
-  summarise(meanprice = mean(AveragePrice)) |>
-  pivot_wider(names_from = type, 
-               values_from = meanprice) |>
-  mutate(avocadoDiff = organic - conventional) |>
-  select(region, avocadoDiff)
+fish <- fish |>
+  mutate(weight = weight *28.35)
 ```
 
 -   character -- specifically a string
@@ -122,14 +124,13 @@ cali_organic_convention <- cali_avocados |>
 
 message |>
   mutate(word_count = str_length(Word)) |>
-  arrange(desc(word_count)) |>
   slice_max(word_count)
 ```
 
 -   factor
 
 ```{r wd-4-factor}
-# Week 4: Lab 4 Q 7 (Revision)
+# Week 4: Lab 4 Q 7 (Revised)
 
 recreate_graph <- cali_avocados |>
   pivot_longer(cols = Small:ExtraLarge,
@@ -168,13 +169,19 @@ combined_data <- cali_avocados |>
 -   `right_join()`
 
 ```{r wd-5-right}
+# Week 4: Lab 4 Q 5
 
+# NOTE: I would use a semi_join here after the resubmissions. But because I did not use a resubmissions for a correct solution for this learning target I can't use a right_join I have in the corrected challenge 4. I could just revere the order of the combined_data set to be the right join instead by flipping cali_avocados and HPI_index.
+
+graphFiveMetro <- avocado |>
+  right_join(topFiveRegions)
 ```
 
 -   `inner_join()`
 
 ```{r wd-5-inner}
-# Week 4: Practice Activity 11 Q 1
+# Week 4: Practice Activity 11 Q 1 (Quiz on Canvas Screenshot include in support)
+
 prof |>
   inner_join(prof_info, prof_course)
 ```
@@ -182,7 +189,8 @@ prof |>
 -   `full_join()`
 
 ```{r wd-5-full}
-# Week 4: Practice Activity 11 Q 1
+# Week 4: Practice Activity 11 Q 1 (Quiz on Canvas Screenshot include in support)
+
 prof |>
   full_join(prof_info, prof_course)
 ```
@@ -194,7 +202,6 @@ prof |>
 ```{r wd-6-semi}
 # Week 4: Lab 4 Q 2
 
-#| message: false
 region_major <- tibble(region = c("GreatLakes",
                                   "Midsouth",
                                   "Northeast",
@@ -236,9 +243,8 @@ metro_avocado <- avocado |>
 -   `pivot_longer()`
 
 ```{r wd-7-long}
-# Week 4: Lab 4 Q 7 (Revision)
+# Week 4: Lab 4 Q 7
 
-#| message: false
 recreate_graph <- cali_avocados |>
   pivot_longer(cols = Small:ExtraLarge,
                names_to = "Avocado Size",
@@ -254,7 +260,7 @@ recreate_graph <- cali_avocados |>
 -   `pivot_wider()`
 
 ```{r wd-7-wide}
-# Week 4: Lab 4 Q 6 (Revision)
+# Week 4: Lab 4 Q 6
 
 cali_organic_convention <- cali_avocados |>
   group_by(type, region) |>
@@ -334,22 +340,20 @@ hiphop_clean |>
 -   Example 2
 
 ```{r r-3-2}
-# Week 2: Lab 2 Q 14
+# Week 7: Lab 7 Q 3
 
-ggplot(data = surveys, aes(x = species, y = weight)) +
-  geom_jitter(color = "darkseagreen") +
-  geom_boxplot(outlier.shape = NA) + 
-  labs(
-    title = "Weight Distribution in Grams by Species",
-    x = "Species"
-  ) +
-  theme(
-    axis.title.y = element_blank(),
-    axis.text.x = element_text(angle=45)
-  )
-
-# Tilted x-axis labels because it would be hard to read.
-# https://www.datanovia.com/en/blog/ggplot-axis-ticks-set-and-rotate-text-labels/
+rescale_01 <- function(vector) {
+  
+  stopifnot(is.numeric(vector), length(vector) > 1)
+  
+  min_num <- min(vector, na.rm = TRUE)
+  max_num <- max(vector, na.rm = TRUE)
+  
+  vector = (vector - min_num) / (max_num - min_num)
+  
+  return(vector)
+         
+}
 ```
 
 ## Data Visualization & Summarization
@@ -396,7 +400,7 @@ ggplot(graphFiveMetro, aes(x = region, y = `Total Volume`, fill = region)) +
 -   categorical variables
 
 ```{r dvs-2-cat}
-# Week 5: Lab 5 Part 2 Q 3
+# Week 5: Lab 5 Part 2 Q 3 (Revised)
 
 ggplot(data = mean_surveys, 
        mapping = aes(x = year, 
@@ -417,7 +421,7 @@ ggplot(data = mean_surveys,
 -   dates
 
 ```{r dvs-2-date}
-# Week 5: Practice Lab 5 Part 3 Q 3
+# Week 5: Lab 5 Part 3 Q 3
 
 ggplot(data = drop_na(dates_collapsed), 
        mapping = aes(x = level, 
@@ -439,7 +443,7 @@ ggplot(data = drop_na(dates_collapsed),
 -   Example 1
 
 ```{r dvs-2-1}
-# Week 2: Lab 2 Q 14 (Revised)
+# Week 2: Lab 2 Q 14
 
 # Code for question 13! 
 ggplot(data = surveys, 
@@ -461,7 +465,7 @@ ggplot(data = surveys,
 -   Example 2
 
 ```{r dvs-2-2}
-# Week 5: Lab 5 Part 1 Q 3 (Revision) (Revised x2)
+# Week 5: Lab 5 Part 1 Q 3 (Revised)
 
 ggplot(data = mean_surveys, 
        mapping = aes(x = year, 
@@ -502,21 +506,20 @@ ugly + theme(
 -   Example 2
 
 ```{r dvs-3-2}
-# Week 4: Lab 4 Q 7
+# Week 7: Challenge 7 Q 3 (Revised)
 
-# Note: Not my original graph, but replicating this graph showed how much there was to learn about visualization and I loved completing this part of the lab.
-
-ggplot(recreate_graph, aes(fill = `Avocado Size`, 
-                           x = region,
-                           y = mean_sold)) +
-  geom_bar(position = "fill", stat = "identity") +
-  facet_wrap(~type) +
+ggplot(data = fish_clean) +
+  facet_wrap(~species) +
+  geom_jitter(mapping = aes(x = year, 
+                            y = cond_index, 
+                            color = section),
+              alpha = 0.25) +
   labs(
-    x = "Region of CA",
-    y = "Proportion of Mean Avocados Sold",
-  ) +
-  scale_fill_manual(labels = c("Small", "Large", "Extra Large"), values = c("#a6cee3", "#1f78b4", "#b2df8a")) +
-  scale_x_discrete(guide = guide_axis(n.dodge = 2))
+    title = "Conditional Index of Fish Distribution",
+    x = "Year",
+    y = "",
+    color = "Section"
+  )
 ```
 
 **DVS-4: I can calculate numerical summaries of variables.**
@@ -546,30 +549,26 @@ mean_surveys <- surveys |>
 -   Example 1
 
 ```{r dvs-5-1}
-# Week 3: Lab 3 Q 4
+# Week 5: Lab 5 Q 2
 
-hiphop |>
-  select(c(asianMove:blackWeekly)) |>
-  summarise(across(everything(), mean))
+mean_surveys <- surveys |>
+  group_by(year, genus) |>
+  summarise(mean_weight = mean(weight))
 ```
 
 -   Example 2
 
 ```{r dvs-5-2}
-# Week 9: Lab 9 Q 9
+# Week 9: Lab 9 Q 1
 
-AllaninCAandPA <- names |>
-  filter(Year == 2000, 
-         Gender == "M",
-         Name %in% c("Alan", "Allan", "Allen"),
-         State %in% c("CA", "PA")) |>
+tables_sorted <- names |>
+  filter(Name == "Allison") |>
+  rename(Sex = Gender) |>
+  pivot_wider(names_from = c(Sex),
+              values_from = Count,
+              values_fill = 0) |>
   group_by(State) |>
-  mutate(Prop = (Count/sum(Count))) |>
-  select(-Year, -Gender, -Count) |>
-  pivot_wider(names_from = c(Name),
-            values_from = Prop,
-            values_fill = 0)
-
+  summarise(F = sum(F), M = sum(M))
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -577,11 +576,16 @@ AllaninCAandPA <- names |>
 -   Example 1
 
 ```{r dvs-6-1}
-# Week 3: Lab 3 Q 4
+# Week 9: Lab 9 Q 1
 
-hiphop |>
-  select(c(asianMove:blackWeekly)) |>
-  summarise(across(everything(), mean))
+tables_sorted <- names |>
+  filter(Name == "Allison") |>
+  rename(Sex = Gender) |>
+  pivot_wider(names_from = c(Sex),
+              values_from = Count,
+              values_fill = 0) |>
+  group_by(State) |>
+  summarise(F = sum(F), M = sum(M))
 ```
 
 -   Example 2
@@ -593,7 +597,6 @@ region_avocado |>
   filter(year == 2017, type == "organic") |>
   group_by(region) |>
   summarise(small_sum_sold = sum(Small)) |>
-  arrange(desc(small_sum_sold)) |> 
   slice_max(small_sum_sold)
 
 ```
@@ -707,32 +710,20 @@ sing_day <- function(dataset, line, phrase_col){
 
 -   Example 2
 
-```{r pe2-2 Not Yet Learned}
-# Week 8: Lab 8 Q 2
+```{r pe2-2}
+# Week 7: Lab 7 Q 3
 
-make_phrase <- function(day, num_word, item, verb, adjective, location) {
+rescale_01 <- function(vector) {
   
-  ## Step 1: Replace NAs with blank strings
-  verb <- str_replace_na(verb, "")
-  adjective <- str_replace_na(adjective, "")
-  location <- str_replace_na(location, "")
+  stopifnot(is.numeric(vector), length(vector) > 1)
   
-  ## Step 2: If the day is larger than 1, the items need pluralized! 
-  if (day > 1){
-    item <- pluralize_gift(item)
-  }
+  min_num <- min(vector, na.rm = TRUE)
+  max_num <- max(vector, na.rm = TRUE)
   
-  ## Step 3: If the day is 1, you need to add an "a" or "an" before the gift 
-  if (day == 1){
-    item <- str_c("a", item, sep = " ")
-    day <- str_c("")
-  } else{
-    day <- english(day)
-  }
+  vector = (vector - min_num) / (max_num - min_num)
   
-  ## Step 4: Glue all of the pieces together to make a phrase! 
-  return(str_squish(glue("{day} {adjective} {item} {verb} {location}")))
-
+  return(vector)
+         
 }
 ```
 
@@ -741,11 +732,19 @@ make_phrase <- function(day, num_word, item, verb, adjective, location) {
 -   `across()`
 
 ```{r pe-3-across}
-# Week 3: Lab 3 Q 4
+# Week 7: Lab 7 Q 3.5
 
-hiphop |>
-  select(c(asianMove:blackWeekly)) |>
-  summarise(across(everything(), mean))
+rescale_column <- function(dataframe, variables) {
+  
+  stopifnot(is.data.frame(dataframe))
+
+  dataframe <- dataframe |>
+    mutate(across(.cols = {{ variables }}, 
+                  .fns = ~rescale_01(.x),
+                  .names = NULL))
+  
+  return(dataframe)
+}
 ```
 
 -   `map()` functions (Provide 2 Examples)
@@ -771,7 +770,7 @@ purrr::map_chr(xmas$Gift.Item, pluralize_gift)
 
 -   Example 1
 
-```{r pe-4-1} ?Not to sure if the class has gone over this section yet...}
+```{r pe-4-1}
 # Week 5: Lab 5 Part 3 Q 3
 
 ggplot(data = drop_na(dates_collapsed2), 
@@ -792,13 +791,30 @@ ggplot(data = drop_na(dates_collapsed2),
 -   Example 2
 
 ```{r pe-4-2}
-# Week 4: Lab 4 Q 4
+# Week 2: Challenge 2 HOT STEP
 
-region_avocado |>
-  separate(Date, c("Year", "Month", "Day")) |>
-  group_by(Month) |>
-  summarise(sold_mean = mean(`Total Volume`)) |>
-  slice_max(sold_mean)
+# NOTE: Not the most efficent vector, but still works!
+
+c_genus <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", 
+                      "#0072B2", "#D55E00", "#CC79A7", "#000000", "#E69F00",
+                      "#56B4E9", "#009E73", "#F0E442", 
+                      "#0072B2", "#D55E00", "#CC79A7")
+
+annotate_graph <- ggplot(data = surveys, aes(x = weight, 
+                                     y = species, color = genus)) +
+  scale_color_manual(values = c_genus) +
+  geom_boxplot() +
+  theme(legend.position = "none") +
+  annotate("text", y = 1, x = 350, label = "Neotoma") +
+  annotate("text", y = 6, x = 300, label = "Sigmodon") +
+  annotate("text", y = 10, x = 200, label = "Test genus")
+  labs(
+    title = "Weight and Hindfoot Length Genus Color Scheme",
+    x = "Weight (g)",
+    y = "Hindfoot Length (mm)"
+  ) +
+  theme_dark()
+annotate_graph
 ```
 
 ## Data Simulation & Modeling

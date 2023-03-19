@@ -20,8 +20,10 @@ library(tidyverse)
 ```
 
 ```{r data}
-message <- read_csv(here::here("data", "scrambled_message.txt")
-                      )
+message <- read_csv(here::here("Week 5",
+                               "Practice Activity 5",
+                               "data",
+                               "scrambled_message.txt"))
 ```
 
 ```{r}
@@ -104,7 +106,6 @@ Careful! There could be multiple punctuation symbols in a word, so `str_extract_
     ```{r}
     message |>
       mutate(word_count = str_length(Word)) |>
-      arrange(desc(word_count)) |>
       slice_max(word_count)
       
     ```

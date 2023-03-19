@@ -35,6 +35,10 @@ Another thing I learned is that Google is your best friend. I was trying to find
 
 One thing I think I could improve on is the exclusion or inclusion regions. I feel they could be done in one or two more steps. I also feel like I could be a much more efficient coder. On the right of my screen I notice so many data sets and I feel if time allotted, I could reduce the amount of data sets in my code.
 
+## Second Revision
+
+For this revision I did some very small changes. First I sliced the top five regions of the max without including the means in the right join. I got rid of those means and only sliced the max values, which make more sense. Second I got the arranges in the slice_max functions. Those lines were unnecessary since I already use slice_max to determine the max value of a column. Lastly I changed the bar chart to the a Cleveland Dot Plot, Professor Theobold recommended to use instead. I'd say the difference is notable. It's easier to read and I think most readers can understand the differences. I also printed the actual values after the chart so it could be easier to understand the data points that were being presented in the Dot Plot.
+
 # **1 Getting Started**
 
 [Download `avocado.csv`](https://atheobold.github.io/stat-331/4_tidyr-joins/Lab/avocado.csv)
@@ -121,8 +125,8 @@ metro_avocado <- avocado |>
 topFiveRegions <- metro_avocado |>
   group_by(region) |>
   summarise(mean_sold = mean(`Total Volume`)) |>
-  arrange(desc(mean_sold)) |>
-  slice_max(mean_sold, n = 5)
+  slice_max(mean_sold, n = 5) |>
+  select(-mean_sold)
 
 graphFiveMetro <- avocado |>
   right_join(topFiveRegions)
@@ -138,7 +142,6 @@ region_avocado |>
   filter(year == 2017, type == "organic") |>
   group_by(region) |>
   summarise(small_sum_sold = sum(Small)) |>
-  arrange(desc(small_sum_sold)) |> 
   slice_max(small_sum_sold)
 ```
 
@@ -155,7 +158,6 @@ region_avocado |>
   separate(Date, c("Year", "Month", "Day")) |>
   group_by(Month) |>
   summarise(sold_mean = mean(`Total Volume`)) |>
-  arrange(desc(sold_mean)) |>
   slice_max(sold_mean)
 
 # Looking at the individual sales, we can see that Feburary had the most amount of avocados sold.
@@ -202,17 +204,21 @@ cali_avocados <- avocado |>
 
 cali_organic_convention <- cali_avocados |>
   group_by(type, region) |>
-  summarise(meanprice = mean(AveragePrice)) |>
-  pivot_wider(names_from = type, 
-               values_from = meanprice) |>
-  mutate(avocadoDiff = organic - conventional) |>
-  select(region, avocadoDiff)
+  summarise(meanprice = mean(AveragePrice))
 
-ggplot(cali_organic_convention, mapping = aes(x = region, 
-                                              y = avocadoDiff, 
-                                              fill = region)) +
-  geom_col() +
-  labs(x = "CA Region", y = "Average Avocado Difference")
+ggplot(cali_organic_convention, mapping = aes(x = meanprice,
+                                              y = region)) +
+  geom_line(mapping = aes(group = region)) +
+  geom_point(mapping = aes(color = type)) +
+  labs(x = "CA Region", 
+       y = "",
+       title = "Average Avocado Difference in California in Dollars",
+       color = "Avocado Type")
+
+```
+
+```{r}
+cali_organic_convention
 ```
 
 Looking at the cali_diff variable, we can see that San Francisco has the biggest difference in price between organic and conventional. Los Angeles has the lowest price difference. Looking at the first graph it's obvious that organic avocados cost a lot more than conventional avocados. Organic avocados cost more by 1 dollar on average, 1.2 more on average in Los Angeles and 1.8 dollars more on average in San Francisco.

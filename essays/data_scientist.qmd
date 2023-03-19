@@ -3,3 +3,5 @@ title: "My Growth as a Data Scientist"
 format: html
 editor: visual
 ---
+
+I feel that I have grown as a data scientist because of how my brain processes these new concepts from R differently. At the beginning of this quarter I had no idea what R, Dplyr, or Tidyverse was. In general, the only R Studio experience I had was in STAT 305 with professor Rossman. From that class I assumed that R Studio was only like a lighter version of Python with no capability of storing new forms of data and being a niche programming community.

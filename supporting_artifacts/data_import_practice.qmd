@@ -4,6 +4,10 @@ format: html
 editor: visual
 ---
 
+```{r}
+library(tidyverse)
+```
+
 ## Step 1: Read in the dataset `ages.csv`.
 
 ```{r}
@@ -16,7 +20,7 @@ read_csv(here::here("Week 2", "Practice Activity", "Ages_Data", "ages.csv"))
 
 ```{r}
 # Code to read in the ages_tab.txt data goes here! 
-read_table(here::here("Week 2", "Practice Activity", "Ages_Data", "ages_tab.txt"))
+read_tsv(here::here("Week 2", "Practice Activity", "Ages_Data", "ages_tab.txt"))
 
 ```
 

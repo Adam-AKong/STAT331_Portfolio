@@ -92,7 +92,7 @@ range_num0 <- function(numbers, min_num = 0, max_num = 0) {
 ```{r}
 replace_measures <- function(dataframe, variables) {
   
-  stopifnot(is.data.frame(dataframe), is.vector(variables, mode = "character"))
+  stopifnot(is.data.frame(dataframe))
 
   dataframe <- dataframe |>
     mutate(across(.cols = {{ variables }}, ~range_num(.x)))
@@ -102,7 +102,7 @@ replace_measures <- function(dataframe, variables) {
 ```
 
 ```{r}
-replace_landw <- replace_measures(fish, c("length", "weight"))
+replace_landw <- replace_measures(fish, c(length, weight))
 new_landw <- drop_na(replace_landw)
 ```
 
