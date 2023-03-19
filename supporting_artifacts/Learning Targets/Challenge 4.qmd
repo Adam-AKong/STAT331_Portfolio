@@ -66,9 +66,11 @@ cali_avocados <- avocado |>
   semi_join(california_cities, by = "region")
 
 combined_data <- cali_avocados |>
-  left_join(HPI_index, by = "region") |>
-  filter(year.x == year.y) |>
-  group_by(year.x, region, AveragePrice)
+  inner_join(HPI_index, by = c("year", "region")) |>
+  group_by(year, region) |>
+  select(year, region, AveragePrice, index_nsa) |>
+  summarise(year_nsa = mean(index_nsa), 
+            AveragePrice = mean(AveragePrice))
   
   
   # Almost 720,000 lines unfiltered when combined
@@ -87,7 +89,7 @@ Note: I had to adjust the names of the four cities to join with semi-join correc
 #|    - "Average Housing Index 2015 - 2018 Boxplot"
 
 
-ggplot(combined_data, aes(x = year.x, y = AveragePrice)) +
+ggplot(combined_data, aes(x = year, y = AveragePrice)) +
   geom_bar(mapping = aes(fill = region),
            position = "dodge", stat = "identity") +
   labs(
@@ -95,14 +97,14 @@ ggplot(combined_data, aes(x = year.x, y = AveragePrice)) +
     y = "Average Avocado Price"
   )
 
-ggplot(combined_data, aes(x = year.x, y = AveragePrice)) +
+ggplot(combined_data, aes(x = year, y = AveragePrice)) +
   geom_boxplot(mapping = aes(fill = region)) +
   labs(
     x = "Year",
     y = "Average Avocado Price"
   )
 
-ggplot(combined_data, aes(x = year.x, y = index_nsa)) +
+ggplot(combined_data, aes(x = year, y = year_nsa)) +
   geom_bar(mapping = aes(fill = region),
            position = "dodge", stat = "identity") +
   labs(
@@ -110,7 +112,7 @@ ggplot(combined_data, aes(x = year.x, y = index_nsa)) +
     y = "Average Housing Index"
   )
 
-ggplot(combined_data, aes(x = year.x, y = index_nsa)) +
+ggplot(combined_data, aes(x = year, y = year_nsa)) +
   geom_boxplot(mapping = aes(fill = region)) +
   labs(
     x = "Year",
@@ -131,14 +133,14 @@ In the second two graphs the average housing index increases every year. The ind
 #|    - "Index NSA Histogram (2015 - 2018)"
 
 ggplot(combined_data) +
-  geom_jitter(mapping = aes(x = AveragePrice, y = index_nsa, 
+  geom_jitter(mapping = aes(x = AveragePrice, y = year_nsa, 
                            color = region, shape = region))
 
 ggplot(combined_data) +
   geom_density(mapping = aes(x = AveragePrice))
 
 ggplot(combined_data) +
-  geom_density(mapping = aes(x = index_nsa))
+  geom_density(mapping = aes(x = year_nsa))
 
 ```
 

@@ -157,12 +157,16 @@ suspects_clean <- suspects |>
 -   `left_join()`
 
 ```{r wd-5-left}
-# Week 4: Challenge 4
+# Week 4: Challenge 4 (Revised)
+
+# NOTE: I revised this because left_join was not the correct join for the challenge. However I revised the solution to use inner_join. But I did not use left_join anywhere else in the quarter.
+
 
 combined_data <- cali_avocados |>
   left_join(HPI_index, by = "region") |>
   filter(year.x == year.y) |>
   group_by(year.x, region, AveragePrice)
+
 ```
 
 -   `right_join()`
@@ -170,7 +174,7 @@ combined_data <- cali_avocados |>
 ```{r wd-5-right}
 # Week 4: Lab 4 Q 5
 
-# NOTE: I would use a semi_join here after the resubmissions. But because I did not use a resubmissions for a correct solution for this learning target I can't use a right_join I have in the corrected challenge 4. I could just revere the order of the combined_data set to be the right join instead by flipping cali_avocados and HPI_index.
+# NOTE: I would use a semi_join here after the resubmissions. But because I did not use a resubmissions for a correct solution for this learning target I can't use a right_join I have in the corrected challenge 4. I could just reverese the order of the combined_data set to be the right join instead by flipping cali_avocados and HPI_index.
 
 graphFiveMetro <- avocado |>
   right_join(topFiveRegions)
@@ -179,10 +183,14 @@ graphFiveMetro <- avocado |>
 -   `inner_join()`
 
 ```{r wd-5-inner}
-# Week 4: Practice Activity 11 Q 1 (Quiz on Canvas Screenshot include in support)
+# Week 4: Challenge 4
 
-prof |>
-  inner_join(prof_info, prof_course)
+combined_data <- cali_avocados |>
+  inner_join(HPI_index, by = c("year", "region")) |>
+  group_by(year, region) |>
+  select(year, region, AveragePrice, index_nsa) |>
+  summarise(year_nsa = mean(index_nsa), 
+            AveragePrice = mean(AveragePrice))
 ```
 
 -   `full_join()`
