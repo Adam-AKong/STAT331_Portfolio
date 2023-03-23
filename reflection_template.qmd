@@ -800,14 +800,10 @@ ggplot(data = drop_na(dates_collapsed2),
 -   Example 2
 
 ```{r pe-4-2}
-# Week 3: Lab 3 Q 14
+# Week 7: Lab 7 Q 2.1
 
-hiphop_clean |>
-  filter(sex == 'Male', ethnic == 'white',
-           age > 17, age < 23,
-           city > 10000, city < 60000) |>
-  slice_max(bieber) |>
-  distinct(subj, .keep_all = TRUE)
+fish |>
+  summarise(across(.cols = everything(vars = NULL), .fns = ~sum(is.na(.x))))
 ```
 
 ## Data Simulation & Modeling
